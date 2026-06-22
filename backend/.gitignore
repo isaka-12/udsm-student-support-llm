@@ -1,0 +1,9 @@
+# pycache files
+__pycache__/
+*.pyc
+
+# env files
+.env
+.env.local
+.env.development.local
+
