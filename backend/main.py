@@ -1,152 +1,188 @@
-# backend/main.py - Using Phi3
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 import httpx
+import json
 import os
+import re
 import time
 from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="Student Support Assistant - Phi3")
+app = FastAPI(title="UDSM Student Support Assistant", version="1.0.0")
 
-# Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configuration
-LLM_MODEL = os.getenv("LLM_MODEL", "phi3")
-LLM_API_URL = os.getenv("LLM_API_URL", "http://localhost:11434/api/generate")
+LLM_MODEL   = os.getenv("LLM_MODEL",   "phi3:latest")
+LLM_API_URL = os.getenv("LLM_API_URL", "http://localhost:11434/api/chat")
 
-# Logging setup
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+MAX_HISTORY    = 20  # total messages kept server-side
+CONTEXT_WINDOW = 8   # messages sent to model per request
+
+chat_history: list[dict] = []
+
+# ── System prompt ──────────────────────────────────────────────────────────────
+SYSTEM_PROMPT = """\
+You are UDSM Assistant — the official student support chatbot for the University of Dar es Salaam (UDSM), Tanzania's oldest and largest public university, located at Mlimani Campus, Dar es Salaam. Motto: Wisdom is Freedom. Website: udsm.ac.tz
+
+SCOPE — answer questions about:
+• Admissions & applications (undergraduate, postgraduate, direct entry, foreign students)
+• Academic programmes, colleges, schools, and departments
+• Course registration, add/drop, deferral, and transfers
+• Examinations, results, academic regulations, and graduation
+• Fees, tuition structure, HESLB loans, and payment methods
+• Student portal (ARIS), ICT services, and e-learning
+• Library services, research support, and university resources
+• Hostels, accommodation applications, and campus facilities
+• Student welfare, clubs, health services, and disability support
+• Contacts, office locations, and general university information
+
+RESPONSE FORMAT:
+• Use Markdown — **bold** key terms, bullet or numbered lists for multi-step info, ## headers for long multi-section answers.
+• For processes (registration, payment, application steps) always use a numbered list.
+• Be as detailed as the question requires — give complete, useful answers; do not truncate.
+• Never repeat the student's question. Never use filler like "Great question!" or "Certainly!".
+• Do not invent specific fees, deadlines, contacts, regulations, or dates.
+• If details are unverified: "I don't have confirmed details on that — please check [udsm.ac.tz](https://www.udsm.ac.tz) or visit the relevant office."
+• If off-topic: "I'm here to help with UDSM matters only. Is there something about the university I can assist with?"\
+"""
+
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+def _clean_response(text: str) -> str:
+    text = text.strip()
+    text = re.sub(r"^(Assistant|UDSM Assistant|Answer|Response)\s*:\s*", "", text, flags=re.IGNORECASE)
+    return text.strip()
+
+
+def _build_messages() -> list[dict]:
+    system = {"role": "system", "content": SYSTEM_PROMPT}
+    turns = [
+        {"role": m["role"], "content": m["content"]}
+        for m in chat_history[-CONTEXT_WINDOW:]
+    ]
+    return [system] + turns
+
+
+# ── Endpoints ──────────────────────────────────────────────────────────────────
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model": LLM_MODEL, "timestamp": time.time()}
+    return {
+        "status": "healthy",
+        "model": LLM_MODEL,
+        "messages": len(chat_history),
+        "timestamp": datetime.now().isoformat(),
+    }
+
 
 @app.post("/ask")
 async def ask_question(question_data: dict):
-    start_time = time.time()
-    
-    # Validate input
-    if not question_data or "question" not in question_data:
-        return JSONResponse(
-            status_code=400,
-            content={"error": "No question provided"}
-        )
-    
-    user_question = question_data.get("question", "").strip()
+    user_question = (question_data or {}).get("question", "").strip()
     if not user_question:
-        return JSONResponse(
-            status_code=400,
-            content={"error": "Empty question"}
-        )
-    
-    # Improved prompt for Phi3
-    SYSTEM_PROMPT = """<|system|>
-You are a University Student Support Assistant. Help students with their questions about university services.
+        return JSONResponse(status_code=400, content={"error": "Question is required"})
 
-University Information:
-- Course Registration: Online through student portal, opens 2 weeks before semester
-- Examination Rules: 75% attendance required, student ID needed
-- Library: Mon-Fri 8am-10pm, Sat 9am-6pm, closed Sunday
-- ICT Support: Email helpdesk@university.edu or call extension 1234
-- Hostel: Applications open in June, apply through student portal
-- Fee Payment: Due at semester start, online or at finance office
-- Academic Calendar: September to June, two semesters
-- Student Conduct: Follow university code of conduct
+    chat_history.append({
+        "role": "user",
+        "content": user_question,
+        "timestamp": datetime.now().isoformat(),
+    })
+    if len(chat_history) > MAX_HISTORY:
+        del chat_history[:len(chat_history) - MAX_HISTORY]
 
-Rules:
-1. Be helpful, friendly, and professional
-2. Provide accurate information based on the context above
-3. If unsure, say "I don't have information about that"
-4. Keep responses concise and clear
-5. Only answer university-related questions
-<|/system|>
+    messages = _build_messages()
+    start = time.time()
+    collected: list[str] = []
 
-<|user|>
-{question}
-<|/user|>
+    async def stream():
+        try:
+            timeout = httpx.Timeout(connect=10.0, read=120.0, write=10.0, pool=10.0)
 
-<|assistant|>"""
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                async with client.stream(
+                    "POST", LLM_API_URL,
+                    json={
+                        "model": LLM_MODEL,
+                        "messages": messages,
+                        "stream": True,
+                        "options": {
+                            "temperature": 0.3,
+                            "top_p": 0.9,
+                            "repeat_penalty": 1.1,
+                            "num_predict": 1000,
+                            "num_ctx": 2048,
+                        },
+                    },
+                ) as response:
+                    response.raise_for_status()
 
-    prompt = SYSTEM_PROMPT.format(question=user_question)
-    
-    try:
-        # Call Phi3 via Ollama
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                LLM_API_URL,
-                json={
-                    "model": LLM_MODEL,
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.7,
-                        "top_p": 0.9,
-                        "num_predict": 300
-                    }
-                }
-            )
-            
-            if response.status_code != 200:
-                return JSONResponse(
-                    status_code=response.status_code,
-                    content={"error": f"LLM error: {response.status_code}"}
-                )
-            
-            result = response.json()
-            answer = result.get("response", "").strip()
-            
-            if not answer:
-                return JSONResponse(
-                    status_code=500,
-                    content={"error": "Empty response from LLM"}
-                )
-            
-            elapsed_time = time.time() - start_time
-            
-            # Log interaction
-            logger.info(f"Question: {user_question[:50]}... | Time: {elapsed_time:.2f}s")
-            
-            return {
-                "answer": answer,
-                "model": LLM_MODEL,
-                "response_time": elapsed_time,
-                "tokens_used": result.get("eval_count", 0)
-            }
-            
-    except httpx.TimeoutException:
-        return JSONResponse(
-            status_code=504,
-            content={"error": "LLM request timeout"}
-        )
-    except httpx.ConnectError:
-        return JSONResponse(
-            status_code=503,
-            content={"error": "Cannot connect to Ollama. Make sure it's running."}
-        )
-    except Exception as e:
-        logger.error(f"Error: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"error": f"Internal error: {str(e)}"}
-        )
+                    async for line in response.aiter_lines():
+                        if not line:
+                            continue
+                        try:
+                            data = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+
+                        token = data.get("message", {}).get("content", "")
+                        if token:
+                            collected.append(token)
+                            yield f"data: {json.dumps({'token': token})}\n\n"
+
+                        if data.get("done"):
+                            answer = _clean_response("".join(collected))
+                            elapsed = round(time.time() - start, 2)
+                            chat_history.append({
+                                "role": "assistant",
+                                "content": answer,
+                                "response_time": elapsed,
+                                "timestamp": datetime.now().isoformat(),
+                            })
+                            yield f"data: {json.dumps({'done': True, 'response_time': elapsed, 'tokens': data.get('eval_count', 0)})}\n\n"
+
+        except httpx.TimeoutException:
+            msg = "Model timed out. Try again."
+            yield f"data: {json.dumps({'error': msg})}\n\n"
+        except httpx.ConnectError:
+            msg = "Cannot connect to Ollama. Make sure 'ollama serve' is running."
+            yield f"data: {json.dumps({'error': msg})}\n\n"
+        except httpx.HTTPStatusError as e:
+            msg = f"Ollama returned HTTP {e.response.status_code}"
+            yield f"data: {json.dumps({'error': msg})}\n\n"
+        except Exception as e:
+            msg = str(e)
+            yield f"data: {json.dumps({'error': msg})}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get("/history")
+async def get_history():
+    return {"count": len(chat_history), "history": chat_history}
+
+
+@app.delete("/history")
+async def clear_history():
+    chat_history.clear()
+    return {"success": True, "message": "History cleared"}
+
 
 @app.get("/model-info")
 async def model_info():
     return {
         "model": LLM_MODEL,
-        "type": "phi3",
-        "capabilities": ["text-generation", "chat", "qa"]
+        "provider": "Ollama",
+        "capabilities": ["question-answering", "student-support", "university-guidance"],
     }
