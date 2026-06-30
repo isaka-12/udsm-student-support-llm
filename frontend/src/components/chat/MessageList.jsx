@@ -1,10 +1,9 @@
-import React from 'react';
 import Bubble from './Bubble';
 import { useAutoScroll } from '../../hooks/useAutoScroll';
 import { useChat } from '../../contexts/ChatContext';
 
 export default function MessageList({ onEdit, onRetry }) {
-  const { messages } = useChat();
+  const { messages, submitFeedback } = useChat();
   const endRef = useAutoScroll([messages]);
 
   return (
@@ -16,10 +15,10 @@ export default function MessageList({ onEdit, onRetry }) {
             message={m}
             onEdit={m.role === 'user' ? onEdit : undefined}
             onRetry={m.isError ? () => {
-              // find the nearest user message before this error
               const prev = messages.slice(0, i).reverse().find(msg => msg.role === 'user');
               if (prev) onRetry(prev.content);
             } : undefined}
+            onFeedback={m.role === 'assistant' ? submitFeedback : undefined}
           />
         ))}
         <div ref={endRef} />

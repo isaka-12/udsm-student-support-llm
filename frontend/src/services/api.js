@@ -79,7 +79,59 @@ export async function fetchHistory(sessionId) {
   return res.json();
 }
 
-export async function* streamQuestion(question, sessionId = 'default') {
+export async function submitFeedback(sessionId, messageIndex, rating, comment = '') {
+  const res = await apiFetch('/feedback', {
+    method: 'POST',
+    body: JSON.stringify({
+      session_id:    sessionId,
+      message_index: messageIndex,
+      rating,
+      comment,
+    }),
+  });
+  if (!res || !res.ok) throw new Error('Feedback submission failed');
+  return res.json();
+}
+
+export async function fetchModels() {
+  const res = await apiFetch('/models');
+  if (!res || !res.ok) return { models: [], current: '' };
+  return res.json();
+}
+
+export async function ingestFile(file) {
+  const token = getToken();
+  const form  = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${BASE}/ingest-file`, {
+    method: 'POST',
+    headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+    body: form,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || 'Ingestion failed');
+  }
+  return res.json();
+}
+
+export async function extractFile(file) {
+  const token = getToken();
+  const form  = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${BASE}/extract-file`, {
+    method: 'POST',
+    headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+    body: form,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || 'File extraction failed');
+  }
+  return res.json();
+}
+
+export async function* streamQuestion(question, sessionId = 'default', { model, fileContext } = {}) {
   const token = getToken();
   const res = await fetch(`${BASE}/ask`, {
     method: 'POST',
@@ -87,7 +139,12 @@ export async function* streamQuestion(question, sessionId = 'default') {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify({ question, session_id: sessionId }),
+    body: JSON.stringify({
+      question,
+      session_id:   sessionId,
+      ...(model       && { model }),
+      ...(fileContext && { file_context: fileContext }),
+    }),
   });
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

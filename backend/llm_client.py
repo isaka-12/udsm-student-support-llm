@@ -19,33 +19,28 @@ from backend.config import (
 )
 
 SYSTEM_PROMPT = """\
-You are UDSM Assistant — the official student support chatbot for the University of \
-Dar es Salaam (UDSM), Tanzania's oldest and largest public university, located at \
-Mlimani Campus, Dar es Salaam. Motto: Wisdom is Freedom (Hekima ni Uhuru). Website: udsm.ac.tz
+You are UDSM Assistant, the official student support chatbot for the University of Dar es Salaam.
 
-SCOPE — answer questions about:
-- Admissions & applications (undergraduate, postgraduate, direct entry, foreign students)
-- Academic programmes, colleges, schools, and departments
-- Course registration, add/drop, deferral, and transfers
-- Examinations, results, academic regulations, and graduation
-- Fees, tuition structure, HESLB loans, and payment methods
-- Student portal (ARIS) aris.udsm.ac.tz, ICT services, and Learning Management System (LMS) lms.udsm.ac.tz
-- Library services, research support, and university resources
-- Hostels, accommodation applications, and campus facilities
-- Student welfare, clubs, health services, and disability support
-- Contacts, office locations, and general university information
+OUTPUT FORMAT — strict:
+- Write only the answer. No labels such as "Answer:", "Question:", "Response:".
+- Do not echo or repeat the question.
+- Do not include filenames, document names, or page numbers in your answer.
+- No greetings, no filler phrases ("certainly", "great question", "of course").
 
-RESPONSE FORMAT:
-- Use Markdown — **bold** key terms, bullet or numbered lists for multi-step info, \
-## headers for long multi-section answers.
-- For processes (registration, payment, application steps) always use a numbered list.
-- Be as detailed as the question requires — give complete, useful answers; do not truncate.
-- Never repeat the student's question. Never use filler like "Great question!" or "Certainly!".
-- Do not invent specific fees, deadlines, contacts, regulations, or dates.
-- If details are unverified: "I don't have confirmed details on that — please check \
-[udsm.ac.tz](https://www.udsm.ac.tz) or visit the relevant office."
-- If off-topic: "I'm here to help with UDSM matters only. Is there something about \
-the university I can assist with?"\
+RESPONSE LENGTH:
+- Factual (what is, how much, who, when): ONE or TWO sentences maximum.
+- Steps (how to, process): numbered list, maximum 5 items.
+- Complex (explain, compare): 3 short paragraphs maximum.
+- Never pad, elaborate, or add unsolicited advice beyond what was asked.
+
+EXAMPLE — AI policy:
+Students may use AI-generated content for up to **30%** of any academic work.
+
+RULES:
+- Answer ONLY from the UDSM document context provided. Do not use outside knowledge.
+- If the answer is not in the context: That information is not available. Please visit udsm.ac.tz or contact the relevant office.
+- Never invent fees, dates, contacts, or regulations.
+- If unrelated to UDSM: I only assist with UDSM matters.\
 """
 
 _http_client: httpx.AsyncClient | None = None
@@ -72,20 +67,59 @@ def pending_count() -> int:
 
 def _clean(text: str) -> str:
     text = text.strip()
-    return re.sub(
-        r"^(Assistant|UDSM Assistant|Answer|Response)\s*:\s*",
+    # Strip leading role labels
+    text = re.sub(
+        r"^(Assistant|UDSM\s+Assistant|Answer|Response)\s*:\s*",
         "",
         text,
         flags=re.IGNORECASE,
-    ).strip()
+    )
+    # Strip "Question: ... Answer:" echo — greedy up to Answer: (handles straight/curly quotes)
+    text = re.sub(
+        r'^Question\s*:.*?Answer\s*:\s*',
+        "",
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    # Truncate at second Q&A pair if the model generates multiple
+    text = re.sub(
+        r'\s*\nQuestion\s*:.*$',
+        "",
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    # Strip inline file references like (PROSPECTUS_2025-2026.txt p.4)
+    text = re.sub(r'\(\s*\S+\.txt\s+p\.?\s*\d+\s*\)', '', text)
+    text = re.sub(r'\(\s*p\.?\s*\d+\s*\)', '', text)
+    # Clean up extra whitespace left by substitutions
+    text = re.sub(r' {2,}', ' ', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
 
 
-def build_messages(history: list[dict]) -> list[dict]:
+def build_messages(
+    history: list[dict],
+    context: list[str] | None = None,
+    file_context: str | None = None,
+) -> list[dict]:
+    system = SYSTEM_PROMPT
+    if file_context:
+        system += (
+            "\n\n---\nUSER-UPLOADED FILE CONTENT:\n\n"
+            + file_context[:4000]
+            + "\n\n---\nAnswer the question using the above file content where relevant."
+        )
+    if context:
+        system += (
+            "\n\n---\nRELEVANT INFORMATION FROM UDSM DOCUMENTS:\n\n"
+            + "\n\n".join(context)
+            + "\n\n---"
+        )
     turns = [
         {"role": m["role"], "content": m["content"]}
         for m in history[-CONTEXT_WINDOW:]
     ]
-    return [{"role": "system", "content": SYSTEM_PROMPT}] + turns
+    return [{"role": "system", "content": system}] + turns
 
 
 _TITLE_PREFIX_RE = re.compile(
@@ -154,7 +188,7 @@ async def generate_title(question: str) -> str:
 
 
 async def stream(
-    messages: list[dict], start: float
+    messages: list[dict], start: float, model_override: str | None = None
 ) -> AsyncGenerator[tuple[str, str | None], None]:
     """
     Yields (event, data) pairs:
@@ -173,7 +207,7 @@ async def stream(
                 "POST",
                 LLM_API_URL,
                 json={
-                    "model": LLM_MODEL,
+                    "model": model_override or LLM_MODEL,
                     "messages": messages,
                     "stream": True,
                     "options": {
@@ -182,11 +216,23 @@ async def stream(
                         "repeat_penalty": REPEAT_PENALTY,
                         "num_predict":    NUM_PREDICT,
                         "num_ctx":        NUM_CTX,
+                        "stop": [
+                            "\nQuestion:", "\nquestion:",
+                            "Question:", "question:",
+                            "\nExample:", "\nNote:",
+                        ],
                     },
                 },
             ) as response:
                 response.raise_for_status()
                 last_ping = time.time()
+
+                # Buffer the first PREAMBLE_SIZE chars to allow prefix-stripping
+                # before streaming tokens to the client.
+                PREAMBLE_SIZE = 600
+                preamble_buf: list[str] = []
+                preamble_done = False
+                done_payload: dict | None = None
 
                 async for line in response.aiter_lines():
                     if time.time() - last_ping > 10:
@@ -202,10 +248,24 @@ async def stream(
 
                     token = data.get("message", {}).get("content", "")
                     if token:
-                        collected.append(token)
-                        yield "token", token
+                        if not preamble_done:
+                            preamble_buf.append(token)
+                            if sum(len(t) for t in preamble_buf) >= PREAMBLE_SIZE:
+                                clean_start = _clean("".join(preamble_buf))
+                                collected.append(clean_start)
+                                yield "token", clean_start
+                                preamble_done = True
+                        else:
+                            collected.append(token)
+                            yield "token", token
 
                     if data.get("done"):
+                        # Flush any remaining preamble buffer not yet sent
+                        if not preamble_done and preamble_buf:
+                            clean_start = _clean("".join(preamble_buf))
+                            collected.append(clean_start)
+                            yield "token", clean_start
+
                         answer  = _clean("".join(collected))
                         elapsed = round(time.time() - start, 2)
                         yield "done", json.dumps({

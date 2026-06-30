@@ -68,8 +68,7 @@ export default function RegisterPage() {
     'w-full rounded-xl border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-600 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-colors';
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 dark:bg-zinc-950">
-    <div className="min-h-full flex flex-col items-center justify-center px-4 py-12 relative">
+    <div className="min-h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4 py-12 relative">
       <button onClick={toggle}
         className="absolute top-4 right-4 p-2 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-white dark:text-zinc-500 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-colors">
         {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -204,7 +203,6 @@ export default function RegisterPage() {
       <p className="text-[11px] text-zinc-400 dark:text-zinc-700 mt-6 text-center">
         University of Dar es Salaam &copy; {new Date().getFullYear()}
       </p>
-    </div>
     </div>
   );
 }

@@ -18,6 +18,11 @@ REPEAT_PENALTY  = float(os.getenv("REPEAT_PENALTY", "1.1"))
 CORS_ORIGINS    = os.getenv("CORS_ORIGINS", "*").split(",")
 LOG_LEVEL       = os.getenv("LOG_LEVEL", "INFO")
 
+# RAG — sentence-transformers model name (HuggingFace hub or local path)
+EMBED_MODEL = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2")
+CHROMA_PATH = os.getenv("CHROMA_PATH", "backend/rag/chroma_db")
+RAG_TOP_K   = int(os.getenv("RAG_TOP_K", "3"))
+
 # MongoDB — defaults match mongoDB/docker-compose.yml; override in backend/.env for any other environment
 MONGODB_URL      = os.getenv("MONGODB_URL",      "mongodb://admin:password@localhost:27017")
 MONGODB_DB       = os.getenv("MONGODB_DB",       "udsm_db")

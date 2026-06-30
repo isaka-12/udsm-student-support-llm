@@ -1,12 +1,19 @@
 import asyncio
+import io
 import json
 import time
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 
+import hashlib
+import re
+
 from backend import llm_client
+from backend.rag import embedder as rag_embedder
+from backend.rag import store as rag_store
 from backend.auth import (
     create_access_token,
     get_current_user,
@@ -19,6 +26,7 @@ from backend.database import database as db
 from backend.logs.logs import logger
 from backend.models.auth_modal import AuthResponse, UserCreate, UserLogin
 from backend.models.chat import AskRequest, FeedbackRequest
+from backend.rag.retriever import retrieve
 
 router = APIRouter()
 
@@ -89,12 +97,18 @@ async def health():
 async def _sse_generator(
     session_id: str, messages: list[dict], start: float,
     user_email: str | None = None,
+    refs: list[dict] | None = None,
+    msg_index: int = 0,
+    model_override: str | None = None,
 ):
+    if refs:
+        yield f"data: {json.dumps({'refs': refs})}\n\n"
+
     final_answer  = None
     final_elapsed = 0.0
     final_tokens  = 0
 
-    async for event, data in llm_client.stream(messages, start):
+    async for event, data in llm_client.stream(messages, start, model_override=model_override):
         if event == "keepalive":
             yield ": keep-alive\n\n"
         elif event == "token":
@@ -104,7 +118,7 @@ async def _sse_generator(
             final_answer  = payload["answer"]
             final_elapsed = payload["elapsed"]
             final_tokens  = payload["tokens"]
-            yield f"data: {json.dumps({'done': True, 'response_time': final_elapsed, 'tokens': final_tokens})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'response_time': final_elapsed, 'tokens': final_tokens, 'message_index': msg_index})}\n\n"
         elif event == "interrupted":
             final_answer = data + " [interrupted]"
         elif event == "error":
@@ -138,12 +152,14 @@ async def ask(req: AskRequest, current_user: dict | None = Depends(get_optional_
     await db.append_message(session_id, "user", question, user_email=user_email)
     if is_first:
         asyncio.create_task(_generate_and_save_title(session_id, question))
-    history  = await db.get_session_messages(session_id)
-    messages = llm_client.build_messages(history)
-    start    = time.time()
+    history          = await db.get_session_messages(session_id)
+    context, refs    = await retrieve(question)
+    messages         = llm_client.build_messages(history, context, file_context=req.file_context)
+    msg_index        = len(history)
+    start            = time.time()
 
     return StreamingResponse(
-        _sse_generator(session_id, messages, start, user_email=user_email),
+        _sse_generator(session_id, messages, start, user_email=user_email, refs=refs, msg_index=msg_index, model_override=req.model),
         media_type="text/event-stream",
         headers={
             "Cache-Control":    "no-cache",
@@ -200,6 +216,146 @@ async def submit_feedback(req: FeedbackRequest):
     await db.update_message_feedback(req.session_id, req.message_index, feedback)
     await db.save_feedback(req.session_id, req.message_index, req.rating, req.comment)
     return {"success": True, "message": "Feedback recorded"}
+
+
+# ── Available models ───────────────────────────────────────────────────────────
+
+@router.get("/models")
+async def list_models():
+    """List locally available Ollama models."""
+    from backend.config import LLM_API_URL, LLM_MODEL
+    base = LLM_API_URL.rsplit("/api/", 1)[0]
+    try:
+        resp = await llm_client._http_client.get(
+            f"{base}/api/tags",
+            timeout=httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0),
+        )
+        resp.raise_for_status()
+        models = [m["name"] for m in resp.json().get("models", [])]
+        return {"models": models or [LLM_MODEL], "current": LLM_MODEL}
+    except Exception:
+        return {"models": [LLM_MODEL], "current": LLM_MODEL}
+
+
+# ── File extraction (temp context) ──────────────────────────────────────────────
+
+@router.post("/extract-file")
+async def extract_file(file: UploadFile = File(...)):
+    """Extract plain text from a PDF or TXT for temporary chat context."""
+    MAX_SIZE = 10 * 1024 * 1024
+    filename = file.filename or ""
+    ext      = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext not in ("pdf", "txt"):
+        raise HTTPException(400, "Only PDF and TXT files are supported")
+    content = await file.read()
+    if len(content) > MAX_SIZE:
+        raise HTTPException(400, "File too large (max 10 MB)")
+    if ext == "pdf":
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(content))
+        text   = "\n\n".join(p.extract_text() or "" for p in reader.pages)
+    else:
+        text = content.decode("utf-8", errors="ignore")
+    text = text.strip()
+    if not text:
+        raise HTTPException(400, "Could not extract any text from the file")
+    return {"text": text[:6000], "filename": filename, "chars": len(text)}
+
+
+# ── Knowledge-base ingestion ─────────────────────────────────────────────────────
+
+_RE_HYPHEN = re.compile(r'(\w)-\n(\w)')
+_RE_NUM    = re.compile(r'^\s*\d{1,4}\s*$', re.MULTILINE)
+
+CHUNK_TARGET  = 600
+CHUNK_OVERLAP = 100
+MIN_CHUNK     = 60
+
+
+def _clean_text(text: str) -> str:
+    text = _RE_HYPHEN.sub(r'\1\2', text)
+    text = _RE_NUM.sub('', text)
+    text = re.sub(r'[ \t]{2,}', ' ', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
+
+def _chunk(text: str) -> list[str]:
+    paragraphs = [p.strip() for p in re.split(r'\n{2,}', text) if p.strip()]
+    units: list[str] = []
+    for para in paragraphs:
+        if len(para) <= CHUNK_TARGET:
+            units.append(para)
+        else:
+            units.extend(s.strip() for s in re.split(r'(?<=[.!?])\s+', para) if s.strip())
+    chunks: list[str] = []
+    buf: list[str] = []
+    buf_len = 0
+    for unit in units:
+        ul = len(unit)
+        if buf_len + ul + 1 > CHUNK_TARGET and buf_len >= MIN_CHUNK:
+            chunks.append(' '.join(buf))
+            tail, tl = [], 0
+            for s in reversed(buf):
+                if tl + len(s) + 1 > CHUNK_OVERLAP:
+                    break
+                tail.insert(0, s); tl += len(s) + 1
+            buf, buf_len = tail, tl
+        buf.append(unit); buf_len += ul + 1
+    if buf_len >= MIN_CHUNK:
+        chunks.append(' '.join(buf))
+    return chunks
+
+
+@router.post("/ingest-file")
+async def ingest_file(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Ingest an uploaded PDF or TXT into the ChromaDB knowledge base."""
+    MAX_SIZE = 10 * 1024 * 1024
+    filename = file.filename or "uploaded_file"
+    ext      = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext not in ("pdf", "txt"):
+        raise HTTPException(400, "Only PDF and TXT files are supported")
+    content = await file.read()
+    if len(content) > MAX_SIZE:
+        raise HTTPException(400, "File too large (max 10 MB)")
+
+    # Extract text page-by-page
+    if ext == "pdf":
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(content))
+        pages  = []
+        for i, page in enumerate(reader.pages, 1):
+            t = _clean_text(page.extract_text() or "")
+            if len(t) >= MIN_CHUNK:
+                pages.append((i, t))
+    else:
+        pages = [(1, _clean_text(content.decode("utf-8", errors="ignore")))]
+
+    all_chunks: list[tuple[str, int]] = [
+        (chunk, page_num)
+        for page_num, page_text in pages
+        for chunk in _chunk(page_text)
+    ]
+    if not all_chunks:
+        raise HTTPException(400, "No usable text found in the file")
+
+    # Batch embed using the running ST model
+    texts      = [c[0] for c in all_chunks]
+    embeddings = await rag_embedder.batch_embed(texts)
+
+    # Upsert to ChromaDB
+    ids, embs, docs, metas = [], [], [], []
+    for idx, ((chunk, page_num), emb) in enumerate(zip(all_chunks, embeddings)):
+        chunk_id = hashlib.md5(f"{filename}:{idx}:{chunk[:80]}".encode()).hexdigest()
+        ids.append(chunk_id); embs.append(emb)
+        docs.append(chunk); metas.append({"source": filename, "page": page_num})
+
+    await rag_store.upsert(ids, embs, docs, metas)
+    logger.info("KB ingest | file=%s | chunks=%d | user=%s", filename, len(ids), current_user.get("email", "?"))
+    return {"chunks": len(ids), "filename": filename}
 
 
 # ── Model info ─────────────────────────────────────────────────────────────────

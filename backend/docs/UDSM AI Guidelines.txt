@@ -1,0 +1,866 @@
+--- Page 1 ---
+i 
+ 
+Kiambatisho 301.3.1A 
+UNIVERSITY OF DAR ES SALAAM 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+GUIDELINES ON ETHICAL USE OF 
+ARTIFICIAL INTELLIGENCE 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+February 2026
+
+--- Page 2 ---
+ii 
+ 
+UNIVERSITY OF DAR ES SALAAM 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+GUIDELINES ON ETHICAL USE OF 
+ARTIFICIAL INTELLIGENCE 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Dar es Salaam, 2026
+
+--- Page 3 ---
+iii 
+ 
+ 
+University of Dar es Salaam 
+Office of the Deputy Vice Chancellor, Research 
+P. O. Box 35091 
+DAR ES SALAAM 
+ 
+Tel./Fax: +255-22-2410743 
+Email: dvc.research@udsm.ac.tz 
+Website: www.udsm.ac.tz 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Copyright ©2026 by University of Dar es Salaam 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+All rights reserved. No part of these guidelines may be reproduced in any form , either by 
+photostat, microform, retrieval system, or any other means , without prior written permission 
+of the publisher.
+
+--- Page 4 ---
+iv 
+ 
+ 
+ 
+ 
+Name of Guidelines Guidelines on the Use of Artificial Intelligence, 2026. 
+Description of Guidelines The guidelines provide standards for the use of 
+Artificial Intelligence at the University of Dar es 
+Salaam. 
+Guidelines applies to University-wide 
+ Staff only Students only 
+ Staff and Students 
+Status New guidelines Revision of existing guidelines 
+Description of Revision Not applicable 
+ 
+ 
+Approval Authority University Council 
+Governing Authority Senate Research and Knowledge Exchange 
+Committee 
+Responsible Officer Deputy Vice Chancellor, Research 
+ 
+ 
+Approval Date 
+Effective Date 
+Date of Last Revision 
+Date of Review
+
+--- Page 5 ---
+v 
+ 
+TABLE OF CONTENTS 
+1. INTRODUCTION .................................................................................................... 1 
+2. DEFINITION OF KEY TERMS .............................................................................. 2 
+3. PURPOSE OF GUIDELINES .................................................................................. 3 
+4. SCOPE OF THE GUIDELINES .............................................................................. 4 
+ARTIFICIAL INTELLIGENCE USE IN RESEARCH, INNOVATION, AND 
+CONSULTANCY ............................................................................................................ 4 
+5. Research .............................................................................................................................. 4 
+6. Innovation ........................................................................................................................... 5 
+7. Consultancy and Public Services ........................................................................................ 6 
+8. Authorship .......................................................................................................................... 6 
+9. Peer review ......................................................................................................................... 7 
+10. Editorial and publication processes ................................................................................ 7 
+11. Research Funding and Compliance ................................................................................ 8 
+ARTIFICIAL INTELLIGENCE USE IN EDUCATION AND PEDAGOGY................. 8 
+12. Academic Integrity and Accessibility ............................................................................. 9 
+13. Specific Uses of AI in Disciplines .................................................................................. 9 
+14. Course Content Creation ............................................................................................... 10 
+15. Course Assessment and Examination ........................................................................... 10 
+16. Dissertations/Theses and Academic Papers .................................................................. 11 
+ARTIFICIAL INTELLIGENCE USE IN ADMINISTRATION ................................... 11 
+17. AI Management ............................................................................................................ 11 
+18. Risks of AI-Enhanced Cyber and Related Attacks ....................................................... 12 
+19. Compliance Oversight and Accountability ................................................................... 12 
+20. Service, Information Quality and Accuracy ................................................................. 12 
+21. Legal Issues in AI Use .................................................................................................. 12 
+22. Staff Training and Professional Development .............................................................. 12 
+23. Amendment and Revision of the Guidelines ................................................................ 12 
+24. Financial Implications ................................................................................................... 13 
+BIBLIOGRAPHY ......................................................................................................... 14 
+APPENDIX: DECLARATION FOR USE OF AI IN SCIENTIFIC WRITING ........... 15
+
+--- Page 6 ---
+vi 
+ 
+LIST OF ACRONYMS 
+ 
+AI Artificial Intelligence 
+DICT Directorate of Information and Communication Technology 
+DVC Deputy Vice Chancellor 
+GAI Generative Artificial Intelligence 
+IP Intellectual Property 
+IT Information Technology 
+LLM Large Language Model 
+MoEST Ministry of Education, Science and Technology 
+PI Principal Investigator 
+PFA Planning, Finance and Administration 
+UDSM University of Dar es Salaam
+
+--- Page 7 ---
+1. INTRODUCTION 
+The University of Dar es Salaam (UDSM) embraces and advocates for the core values of ethical 
+conduct and integrity in research, innovation, administration, teaching and learning , and 
+consultancy. Adherence to these core values by the UDSM community (staff and students) 
+promotes transparency and accountability, which are potential qualities for the University to 
+achieve excellence locally, regionally, and internationally. UDSM manifests this achievement 
+through her grand vision UDSM 2061 of becoming a reputable world-class university that is 
+responsive to national, regional and global development needs through engagement in 
+dynamic knowledge creation and application . Achieving this ambitious goal requires 
+establishment and reinforc ement of robust and effective policies and guidelines, including 
+those that respond to the impact of emerging technologies, such as Artificial Intelligence (AI), 
+on ethics and best practices of the University’s primary functions and processes. 
+ 
+Recently, we have wi tnessed an increased use of Generative AI (GAI) and AI -assisted 
+technologies in research , innovation, academics, and administration . GAI, a disruptive 
+technology that mimics human intelligence in content generation , has completely 
+revolutionized our traditional approaches of doing research, teaching, and administrative tasks. 
+Researchers, including postgraduate students and their supervisors, apply GAI to refine 
+research ideas, devise strategies for efficient literature review, and polish language , among 
+other applications. Journal editors apply GAI to automatically assess and identify suitable 
+manuscripts, based on the pre -defined standards and criteria, which can be sent out for peer 
+review. Consultants and administrators leverage GAI capabilities to generate plausible reports 
+for funders . In the midst of these promising applications, there has been several observed 
+ethical and practical concerns on the use of GAI. Addressing these concerns is imperative to 
+ensure quality, integrity, and transpare ncy across all key functions and processes of an 
+institution. Recognizing the adverse impacts of these concerns, UNESCO established 
+Guidance for GAI in Education and Research1. Additionally, in January 2025, the Ministry of 
+Education, Science and Technology ( MoEST) established the National Guidelines for 
+Artificial Intelligence in Education . These guidelines ensure effective, ethical, secure and 
+responsible use of AI tools within the Tanzania’s education sector. 
+ 
+These national developments have p rompted UDSM to institute specific guidelines for the 
+UDSM community to responsibly use AI while ensuring effective knowledge creation and 
+dissemination. The guidelines extend the scope of UDSM units, including the Offices of DVC–
+Research, DVC–Academic, and DVC–PFA, to address concerns emanating from exponentially 
+growing use of AI by researchers , innovators, academicians, administrators, consultants, and 
+students. 
+ 
+The UDSM Artificial Intelligence Guidelines (2025) aim to establish general principles that 
+ensure proper use of AI in research , innovation, administration, teaching and learning , and 
+consultancy. The guidelines are anchored on the National Guidelines for Artificial Intelligence 
+in Education (2025), National Digital Education Strategy (2024/25 – 2029/30), National 
+Digital Education Guideline s (2025), Tanzania Digital Economy Framework (2024-2034), 
+UDSM ICT Policy (2022), and UDSM Research Ethics Policy and Operational Procedures 
+(2010). They are also benchmarked from reputable research and academic institutions, 
+publishers, journals, and index ing databases. The general objective remains to recognize the 
+ 
+1 https://www.unesco.org/en/articles/guidance-generative-ai-education-and-research
+
+--- Page 8 ---
+impact of AI in academia, ensuring that this promising technology is ethically used to create, 
+refine, and advance knowledge. 
+ 
+The UDSM AI Guidelines adhere to guiding principles of data protection because Generative 
+AI necessitate uploading of data and information into AI tools to generate or modify content. 
+These principles include National Data Protection Act (2023) and UDSM Security Policy and 
+Operational Procedures (2020). 
+ 
+2. RATIONALE 
+The establishment of UDSM guidelines on the ethical use of GAI in her Units (schools, 
+colleges, and institutes) builds from the rapid integration of this emerging technology into 
+teaching and learning, research and innovation, administration, and consultancy. Considering 
+the potential impact of GAI, establishing the guiding principles on its use becomes paramount. 
+If used without transparency, GAI tools can undermine the principles of honesty, originality, 
+critical thinking, fairness, and intellectual autonomy that UDSM upholds (National Guidelines 
+for Artificial Intelligence in Education, 2024; National Digital Education Strategy, 2024/25 – 
+2029/30). 
+In academic settings, GAI pose unique risks that demand careful management. Institutions 
+must address these risks proactively through ethical guidelines to identify, evaluate, and 
+minimize potential harms. GAI may, for instance, introduce bias and discrimination, where 
+algorithms can reinforce inequities in areas such as admission processes, grading, student 
+support services, or research applications (Cornell University, 2023). 
+These guidelines are also informed by critical concerns in privacy and data protection. Feeding 
+sensitive student information, research data, or personal details into publicly accessible AI tools 
+can lead to security breaches or unintended reuse by third p arties. Over -reliance on AI by 
+students or faculty risks undermining core competencies, such as writing proficiency, analytical 
+thinking, and problem-solving abilities. Finally, the opaque nature of many AI systems hides 
+the reasoning behind decisions in a ssessments or recommendations, which undermines trust 
+and accountability (Cornell University, 2023; Flanagin et al., 2024). 
+UDSM plays a vital role in building trust with key stakeholders , including employers and 
+development partners, by providing clear insights into the application of GAI in credentialing 
+and knowledge generation. Transparent and consistent guidelines help alleviate confusion, 
+anxiety, and perceptions of unfairness, fostering confidence in ethical practices. Surveys reveal 
+that stakeholders increasingly prioritize institutions with clear GAI guidelines . Furthermore, 
+UDSM bears a societal duty to cultivate AI -literate graduates who grasp not only practical 
+applications but also the technology's ethical dimensions, limitations, and broader societal 
+effects. With expertise spanning wider academic fields (e.g., philosophy, law, computer 
+science, engineering, and education), UDSM is ideally positioned to lead by example, 
+promoting ethical reasoning and sparking critical discussions on GAI. 
+ 
+3. DEFINITION OF KEY TERMS 
+For the purpose of these guidelines, the following definitions of the key terms shall be adopted:
+
+--- Page 9 ---
+3.1 Academic or technical or administrative Staff shall refer to all personnel employed by 
+the University primarily for teaching, research, and consultancy; 
+3.2 Artificial Intelligence shall refer to simulation of human intelligence in machines, 
+encompassing learning, reasoning, problem solving, perception, and decision making; 
+3.3 AI Tools shall refer to software applications or platforms that utilize AI techniques to 
+perform specific tasks or solve particular problems. 
+3.4 Author shall refer to any person who individually or jointly with others makes a design, 
+a mark or copyrightable work and who meets the criteria for authorship under the 
+Copyright and Neighbouring Rights Act of Tanzania. 
+3.5 Editor (such as journal editors, book editors, managing editors, or associate editors) 
+shall refer to persons who are professionals responsible for overseeing the peer-review 
+process by selecting appropriate reviewers, providing guidance to authors and 
+reviewers, making decisions (e.g., accept, revise, or reject ) on submissions , and 
+publishing written content. They ensure quality and accuracy of the published content, 
+adhering to publication standards. 
+3.6 Ethical/Responsible Use of AI shall refer to the use of AI tools in a manner that is 
+trustworthy-that is, lawful (compliant with applicable laws and regulations), ethical 
+(aligned with ethical principles and values), and robust (technically sound and mindful 
+of its social context)2. 
+3.7 Generative Artificial Intelligence shall refer to the type of AI that can produce different 
+types of content, including text, images, audio, video, and synthetic data. 
+3.8 Innovation shall refer to conversion of ideas or inventions into products with economic 
+value to meet market demands. 
+3.9 Large Language Model shall refer to a model that uses AI, specifically deep learning 
+algorithms, for natural language processing tasks, including la nguage generation, 
+summarization of information, answering questions, and writing different types of 
+creative contents. 
+3.10 Privacy shall refer to the aspect of controlling how personally identifiable information 
+and data are collected, stored, and used in computing devices, such as computer, and 
+the Internet. 
+3.11 Publisher shall refer to the approved entity of the University responsible for the entire 
+publication process, including editorial management, peer review coordination, 
+formatting, printing, online hostin g, marketing, and distribution of research papers, 
+journals, books, and other scholarly works in hardcopies (written), digital, or 
+multimedia content. 
+3.12 Reviewer shall refer to a specialist in a relevant field who assesses submitted research 
+manuscripts to determine their quality and appropriateness for publication in journals. 
+3.13 Consultancy and public services shall refer all internal and external consultancy, service 
+jobs, and contracted works , such as laboratory testing against certain national and 
+international standards/compliance, as defined by the UDSM Consultancy Policy and 
+Operational Procedures. 
+3.14 University shall refer to the University of Dar es Salaam. 
+4. PURPOSE OF GUIDELINES 
+4.1 To establish a framework under which the University encourages and reinforces ethical 
+and practical use of AI in academic publishing, academic and administrative tasks, 
+research and innovation, and consultancy, and seeks to balance the exciting new 
+possibilities offered by these tools with the awareness of their limitations; 
+ 
+2 https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai
+
+--- Page 10 ---
+4.2 To provide guidance to Colleges, Schools, Departments, and employees of the 
+University on matters of AI usage and the need for rigorous attention to accu racy, 
+intellectual property, security, data protection and privacy of personally identifiable 
+information, and ethical issues; 
+4.3 To ensure that a consistent approach is adopted by staff and students , and that all 
+principles for the accountability of AI usage are taken into account and in compliance 
+with relevant rules and regulations of the University. 
+5. SCOPE OF THE GUIDELINES 
+These guidelines shall apply to Generative AI and related technologies that can generate or 
+modify content (e.g., text, audio, image, or video) and to the following groups: 
+5.1 All academic, administrative and technical staff employed by the University of Dar es 
+Salaam, who, at any time of their employment, are required to engage in research, 
+innovation, administration, teaching and learning , and consultancy within the 
+University; 
+5.2 All UDSM academic staff on tenure track (permanent and pensionable) employment 
+who hold leadership positions within the University and who have administrative and 
+technical staff reporting. The guidelines shall also be applied to visiting scholars, 
+researchers, and staff on contract (e.g., part-time staff), and occasional students who 
+shall be engaged in research, innovation, administration, teaching and learning , and/or 
+consultancy; 
+5.3 All academic and administrative units with their constituencies that house academic 
+publishing outlets, such as journals; 
+5.4 All undergraduate and postgraduate students who are required to engage in research, 
+innovation, and academics as part of the fulfilment of the award of their degrees. 
+ARTIFICIAL INTELLIGENCE USE IN RESEARCH, INNOVATION, AND 
+CONSULTANCY 
+These guidelines instill trust and transparency among key participants that engage research , 
+innovation, and consultancy outputs. They ensure that AI is deployed responsibly in academic 
+writing, publishing, research funding, innovation, and consultancy or public services in a way 
+that is fair, safe, and accountable. Concerned with potential threats and risks of AI, reputabl e 
+publishers and leading research institutions have established policies and guidelines on the 
+responsible use of AI. The goal remains to create and disseminate intelligible knowledge that 
+aligns with globally established ethical principles. On this account, any use of AI in research 
+(e.g., idea generation and exploration, coding assistance, interactive online search, and 
+literature classification/drafting), innovation, and consultancy shall be declared (Appendix). 
+The proportion of AI generated content, especially when the AI tool is used in writing, shall 
+not exceed 30%. 
+6. Research 
+6.1 Researchers are encouraged to make themselves aware of the limitations of AI, and 
+ensure that they are responsible for the integrity of the research and the output produced. 
+It is the researcher’s responsibility to counteract and avoid limitations of AI and AI -
+assisted tools, including generation of biased and inaccurate content. Researchers 
+cannot offload responsibility for bias in their work on the AI system. 
+6.2 Researchers shall use AI or AI -assisted tools in the following ways to support data 
+collection and generation:
+
+--- Page 11 ---
+i. Collecting and organizing data; 
+ii. Generating data out of unstructured information; 
+iii. Summarizing data coming from various sources; and, 
+iv. Scaling up data collection with AI by conducting faster and less resource 
+intensive experiments. 
+6.3 Researchers may use AI responsibly to triage, organize, summarize, and quickly get 
+directionally oriented, in the context of an exponentially growing base of reported 
+claims and established knowledge as they prepare research proposals; 
+6.4 Researchers shall not use AI or AI -assisted tools for generating and recording data, 
+except for building the infrastructure for which data can be reproduced; 
+6.5 Researchers, including principal investigators (PIs) and supervisors of postgraduate
+ students, shall provide leadership, guidance, and mentorship to early-career researchers 
+of the University on the ethical use of AI; they shall communicate the standards and the 
+norms in their specific fields, ensuring integrity and quality of the research; 
+6.6 Researchers are encouraged to first generate research hypotheses (or research 
+questions) using their personal creative processes before seeking AI for ideation of the 
+hypothesis, thereby preventing leakages into the public space and therefore damaging 
+the reputation of both researcher and institution. 
+7. Innovation 
+7.1 Any use of AI in conceiving an invention, reducing it to practice, or generating 
+copyrighted materials must be carefully documented and disclosed to all relevant 
+parties involved in the publicatio n. Within these disclosure and documentation 
+requirements, AI may be used in a limited, transparent manner to support innovation 
+activities, such as brainstorming, generating alternative approaches, and structuring or 
+outlining complex ideas and content, p rovided that the human contributors remain 
+responsible for the originality, accuracy, and final form of the work; 
+7.2 The University has limited ability to oversee how privately owned AI tools collect, 
+retain, or reuse user -provided information—often for the provider’s commercial 
+purposes and without compensating the original authors. Therefore, when research is 
+likely to result in commercialization or revenue -generating publications, researchers 
+should preferentially use AI tools who se training data and licensing terms are clearly 
+compatible with public-domain or properly licensed content (and whose terms do not 
+claim rights over user inputs or outputs). In all cases, before uploading any text, data, 
+images, code, or other materials i nto an AI system, researchers and innovators must 
+confirm that they have the legal and contractual rights to share that material (including 
+third-party data, copyrighted content, and confidential or sponsored research materials), 
+whether or not they expect financial benefit from the AI-assisted output; 
+7.3 Staff are encouraged to embed AI usage within a larger innovation strategy, i.e., 
+UDSM Guidelines for Commercialization of Intellectual Property, Innovations and 
+Research Products, that has demonstratable results; 
+7.4 UDSM shall promote the responsible use of AI tools by academics, research centers, 
+research centers of excellence, and institutes/schools/colleges to improve the 
+competitiveness of University innovations. UDSM shall use AI for trend scanning and 
+evidence synthesis to identify emerging scientific and market developments, prioritize 
+promising directions, and support early decisions on funding, partnerships, prototyping, 
+and commercialization.
+
+--- Page 12 ---
+8. Consultancy and Public Services 
+8.1 UDSM Staff members shall ensure ethical use of AI in all activities related to 
+consultancy or public services , which include marketing and branding of UDSM , to 
+carry out consultancy, monitoring and evaluation of consultancy activities, capacity 
+building to the members of UDSM and the public in general by declaring any content 
+generated from AI, such as consultancy reports; 
+8.2 To ensure accountability in consulta ncy and public service work, UDSM staff shall 
+appoint a designated owner for each AI system, define the owner’s responsibilities, and 
+document the system’s intended use, limitations, and decision authority. The owner 
+shall provide ongoing oversight by verifying outputs against agreed quality and ethical 
+standards, keeping records of AI use and key decisions, monitoring for errors or bias, 
+and promptly correcting, escalating, or discontinuing use when issues arise; 
+8.3 UDSM members engaging in consultancy activities shall ensure privacy and data 
+security related to their clients at all the time while ensuring compliance to regulations, 
+and address risks of data breaches, including AI generated data. 
+9. Authorship 
+9.1 Authors shall not use AI or AI -assisted tools to create or alter multimedia (e.g., 
+enhancing, moving, removing, or introducing specific features), including images and 
+videos, in submitted manuscripts, except when such tools are used as part of the 
+research design or research method to generate or interpret the underlying research data; 
+9.2 Authors that use generative AI or AI -assisted tools in the writing process shall ensure 
+that such tools are used only to improve readability and language of the content; authors 
+shall be responsible and accountable for the originality, validity, accuracy, and integrity 
+of their works, noting that AI can produce erroneous results and citations; 
+9.3 Authors may, subject to authorship, citation, and fact-checking considerations, use AI 
+to ideate and iterate on the quality of a literature review. Examples include the 
+following: 
+i. refining the review to include both prior research and its connection to the new 
+research idea; 
+ii. rewriting the style of the literature review; and, 
+iii. refining the literature review to emphasize the contribution of the new research, 
+along with its relevance to other gaps in literature, uncertainties, or even market 
+sentiments. 
+However, authors should fact-check the literature and be aware of incomplete, biased, 
+ or even false AI outputs; 
+9.4 Researchers may use AI or AI -assisted tools for improving workflows and research 
+processes, including constructing or critiquing survey questions or interview templates; 
+Authors are encouraged to use well -documented AI resources for collecting and 
+processing data; 
+9.5 Authors shall not list or cite AI and AI-assisted technologies as an author or co-author; 
+ in this context, authorship means a natural human entitled to carry out responsibilities
+ and tasks related to the research, such as providing contractual assurance on the 
+integrity of the research, consenting to UDSM Journal Policy and Guidelines 
+through publishing agreements, taking accountability on the content, and drawing 
+conclusions;
+
+--- Page 13 ---
+9.6 Authors must fulfil all core scholarly responsibilities and shall not submit manuscripts 
+in which AI tools replace essential author s’ work (e.g., study design, 
+analysis/interpretation, conclusions, or ensuring accuracy and integrity); 
+9.7 Authors shall ensure adherence to AI software’s specific usage policies, including 
+proper attribution to content; 
+9.8 When using AI tools, authors shall comply with all relevant UDSM regulations on 
+intellectual property, research ethics, and confidentiality, because AI tools may transmit 
+or expose sensitive, proprietary, or confidential information to third parties and thereby 
+breach institutional rules and confidentiality obligations; 
+9.9 Authors must be aware of the acceptable standards of using AI in different publication
+ types (e.g., journal articles, books, talks, reports, reviews, research proposa ls, and
+ conferences), and must check for the relevant policies and guidelines governing the
+ usage. 
+10. Peer review 
+10.1 Reviewers shall treat manuscripts as confidential documents, and shall not upload the 
+assigned unpublished manuscripts, either in whole or in part, into Generative AI tools 
+and associated systems to avoid violation of authors’ confidentiality and proprietary 
+rights, breach of data protection rights, or exposure of authors’ identifying information 
+outside the peer review system; 
+10.2 Reviewers shall not upload their peer review reports, which may contain sensitive 
+information of the manuscript, or authors’ manuscripts and associated supporting files, 
+into AI tools and associated systems, even if the use of such tools is restricted to 
+language improvement for readability; 
+10.3 Reviewers shall not use Generative AI or AI -assisted technologies to assume their 
+primary responsibility of critically reviewing and critiquing the research or scientific 
+content as such technologies may generate inaccurate, biased, or incomplete 
+conclusions; 
+10.4 Reviewers shall ensure integrity and accuracy of their peer review reports, and shall be 
+responsible and accountable for the accuracy and views expressed in their reports; 
+10.5 Reviewers shall be compliant with regulations on intellectual property, ethical research, 
+and confidentiality since AI may disclose sensitive inf ormation to a third party, which 
+may be a violation of regulations and confidentiality. 
+11. Editorial and publication processes 
+11.1 Editors shall treat unpublished manuscripts as confidential documents and keep 
+submission details confidential; 
+11.2 Editors shall not upload authors’ decision letters into Generative AI tools, even for the 
+reason of language improvement, to avoid possible exposure of authors’ identifying 
+information or manuscripts’ confidential information; 
+11.3 Editors may use AI or AI -assisted technologies approved by the publisher for 
+prescreening of the manuscripts to evaluate their originality or ethical use of AI; 
+11.4 Editors shall not use AI or AI -assisted technologies for decision -making of the 
+manuscripts as critical thinking and original assessment of the manuscripts falls outside 
+the scope of such technologies; 
+11.5 Editors shall be responsible and accountable for any editorial actions or processes, 
+including final decisions communicated to the authors, related to their use of AI or AIassisted technologies;
+
+--- Page 14 ---
+11.6 Editors shall be compliant with regulations on intellectual property, ethical research, 
+and confidentiality since AI may disclose sensitive information to a third party, which 
+may be a violation of regulations and confidentiality; 
+11.7 Editors shall ensure that authors and peer reviewers comply with these guidelines on 
+the use of AI in academic publishing; 
+11.8 Publishers shall ensure that editors are provided with necessary tools, such as advanced 
+AI detection software, to e valuate submissions before acceptance or before such 
+submissions are sent out for peer review; 
+11.9 Editors shall, whenever possible and applicable, include in their reports any 
+inappropriate use of AI or AI-assistive tools from the authors’ manuscripts; 
+11.10 Publisher shall ensure that records of each submitted, reviewed, rejected, and published 
+manuscript, including details of the responsible persons involved in any capacity, are 
+securely stored while maintaining confidentiality at all stages; 
+11.11 Publisher shall ensure compliance of these guidelines, and shall take necessary actions, 
+as stipulated in their relevant policies and guidelines , against manuscripts flagging 
+unethical use of AI before the publication process begins; 
+11.12 Authors shall disclose to editors their use of AI and AI -assisted tools to facilitate 
+research assessment, transparency, and reproduci bility; any AI -generated content, 
+including, but not limited to, text, figures, tables, images, and codes, shall be 
+accompanied by a disclosure statement in the Acknowledgement section or a relevant 
+part of the manuscript, and shall align with local and global policies and guidelines. 
+12. Research Funding and Compliance 
+12.1 The Principal Investigator ( PI) shall be primarily responsible and accountable for the 
+accuracy and integrity of information contained in the proposal or research reports 
+submitted to the funder, including the University; 
+12.2 The PI shall discuss with collaborators the risks of entering research information into 
+AI tools. Such information may be sensitive (e.g., unpublished technical details) or 
+personal (e.g., current or pending funding). The PI remains responsible for the security 
+of the research information, and any person intending to input information into an AI 
+tool shall first obtain approval from the information owner (e.g., the PI); 
+12.3 The source of funds for AI in research shall depend on ho w the AI is being used in a 
+particular study. However, where research grant proposal templates categorize software 
+services as part of the budget, then it is plausible that the use of AI in the study may be 
+acceptable. 
+ARTIFICIAL INTELLIGENCE USE IN EDUCATION AND PEDAGOGY 
+Educational settings vary significantly across the University of Dar es Salaam : from large 
+lecture halls to seminars ; from teaching and research labs, field, or studio avenues to clinical 
+and practicum-based settings. AI has potential uses in almost all these settings. For example, 
+lecturers can use AI and AI-assisted technologies to develop lecture outlines and materials, 
+generate multiple versions of assignments, or compose practice problems. Students can use AI 
+to research topics and study areas, iterate on text to improve written work, program, design and 
+create code, art, and music, and many other uses. Depending on the use, however, AI could 
+end up “doing the learning” tha t an assignment is designed to elicit, or distorting the value of 
+assessments, depending on the student’s use of AI tools. 
+In order to address these risks and take advantage of the opportunities that AI offers, lecturers 
+have re-assessed learning outcomes in the UDSM Curriculum Review of 2025. However, it is 
+still crucial that lecturers re -assess their courses in light of the advent of AI. To do so, they
+
+--- Page 15 ---
+should consider the expectations of later courses that build on the knowledge and skills their 
+courses are meant to develop in students; the expectations that future workplaces will have for 
+employees’ responsibility on the ethical use of AI tools; and the new opportunities for the 
+purposeful use of AI tools to aid learning. 
+ 
+Noting the potential risks of AI in education and pedagogy, any use in academic writing shall 
+be declared (Appendix). The threshold for AI generated content shall not exceed 30%. This 
+declaration ensures that the reported work adheres the predefined ethical guidelines for using 
+AI. The goal remains to disseminate knowledge while upholding academic integrity. 
+13. Academic Integrity and Accessibility 
+13.1 The use of AI technologies shall be i ntegrated into teaching in ways that enhance 
+learning objectives, and shall be accompanied by strategies to improve students’ 
+understanding and practice of academic integrity: 
+i. Instructing students on the necessity of academic integrity, and what it 
+constitutes; 
+ii. Guiding students toward s scholarly and applied practices consistent with 
+academic integrity; 
+iii. Clarifying intention of each learning outcome. 
+13.2 Academic staff shall be discouraged to use AI automatic detection algorithms for 
+academic integrity violations, given their unreliability and current inability to provide 
+definitive evidence of violations; 
+13.3 The University shall, from time to time, identify acceptable AI tools for checking 
+academic integrity. 
+14. Specific Uses of AI in Disciplines 
+14.1 Writing Skills Courses : AI tools offer opportunities to help students develop their 
+writing skills through assisting in planning, outlining, editing, and providing 
+individualized feedback. However, use of AI for generating text and editing in the 
+writing process raises major concerns about attribution of work, academic integrity, 
+plagiarism, and failure to develop foundational and advanced writing skills an d 
+judgment. Guided use of AI is encouraged as the best approach to further, rather than 
+to undermine, learning outcomes. AI can be used for the following purposes: 
+i. Generate an outline for a written report that students practice revising; 
+ii. Summarize themes f rom a meeting transcript that students organize and 
+prioritize; 
+iii. Brainstorm ideas that students then evaluate; 
+iv. Generate lists of sources that students validate and assess. 
+14.2 Creative Courses : Creative fields , such as art and music , have long engaged in 
+discussions on what is “original work” and how technology can enhance creativity. 
+Practitioners, including students, are highly motivated to develop their skills, but may 
+also be eager to use new technologies to create. While there ar e many opportunities, 
+concerns exist around ethical attribution of sources and copyright violations. There 
+should, therefore, be ethical use of AI in creative courses so as to allow students time 
+to develop their own design sense/creative perspective that comply with AI ethical 
+standards. Instructors should include critical discussions of the sources of data that are 
+used to build these tools in their pedagogy; 
+14.3 Social Sciences, Humanities, and Law Courses: In the social sciences, humanities, and 
+laws, the advent of AI raises particular concerns for the written assignments,
+
+--- Page 16 ---
+individual/group assignments, presentations, lab sessions, project works, tests, quizzes, 
+homeworks, papers, and exams that are a core component of student work in many 
+courses. Passive reliance on AI by students to generate literature reviews or written 
+work risks undermining the learning objectives of assignments, producing poor quality 
+work, and violating academic integrity and standards. Instructors are encouraged to 
+explore ways to responsibly incorporate AI into social science , humanities, and law 
+courses in ways that enhance student learning. This can include having students 
+evaluate AI output and explore ways to test its validity; 
+14.4 Mathematics, Physical Sciences, Computer Science, and Engineering: Technical and 
+mathematical courses have adjusted well in the past to incorporate new technologies, 
+such as computing and visualization tools. AI may provide similar opportunities to 
+enhance education in the space of mathematics, computer science, physical sciences, 
+and engineering. Some of the biggest concerns with current systems is their inaccuracy 
+and circular reasoning. Instructors should make themselves aware of the capabilities of 
+current systems and the fast-changing behavior of these systems on mathematical , 
+scientific, and engineering problems. Students should be educated on the capabilities 
+and limitations of these systems, prohibiting their use where basic skills need to be 
+developed, and encouraging their use in cases that can improve student learning. 
+15. Course Content Creation 
+15.1 Academic staff should be explicit in identifying expectations regarding the use of AI 
+tools in their courses, including individual assignments; 
+15.2 Academic staff are encouraged to identify well -defined learning outcomes to provide 
+rationale on how and when AI can/cannot be used in their courses; 
+15.3 When AI is permitted, academic staff should be clear about student expectations in 
+terms of documentation and attribution, what work is expected to be produced by the 
+student themselves, and how the student is expected to validate or verify the output 
+from AI; 
+15.4 Academic staff are encouraged to engage in ongoing conversations about the 
+importance of academic int egrity, including the fact that basic academic integrity 
+principles remain important and still apply regardless of the existence of AI tools; 
+15.5 Integrating critique of current practices and uses of AI, including ethical issues, into all 
+stages of teaching and learning is vital; 
+15.6 While academic staff may use AI as a tool for developing teaching materials, they are 
+particularly encouraged to adhere to the same standards of attribution that they require 
+of their students. 
+16. Course Assessment and Examination 
+16.1 Students should ensure ethical use of AI in open-book assignments (e.g., 
+individual/group assignment, presentations, lab work, project work, and quiz); 
+16.2 The use of AI in closed-book assignments and examinations is prohibited; 
+16.3 The use of AI to generate report s or presentation materials from Practical 
+Training/Teaching Practice and students’ projects, including final -year projects, is 
+prohibited; 
+16.4 Course instructors should ensure ethical use of AI in assessing students’ works, 
+including reports from lab works and reports from Practical Training/Teaching Practice.
+
+--- Page 17 ---
+17. Dissertations/Theses and Academic Papers 
+17.1 Any use of AI in the conception, production, analysis and/or writing of a 
+dissertation/thesis should be carefully documented and disclosed to the Office of 
+Director of Postgraduate Studies; 
+17.2 The use of AI in the conception, production, analysis and/or writing of journal paper, 
+book, review report, reports, proposal and any related forms of academic writing should 
+be carefully documented and disclosed to the Office of Director of Research and 
+Publication; 
+17.3 Academic supervisors should ensure ethical use of AI in reviewing and assessing 
+students’ dissertations/theses and manuscripts. 
+ARTIFICIAL INTELLIGENCE USE IN ADMINISTRATION 
+AI use in administration is a strategic opportunity to elevate standards, reconsider policies and 
+procedures, and meet the evolving needs of UDSM stakeholders. These guidelines have delved 
+into the risks, use cases and benefits of AI within and between the university’s administrative 
+services, aiming at identifying means to support UDSM mission and vision effectively and 
+efficiently. These guidelines on AI administrative use are informed by key principles that 
+include ethical and safe use, data quality and control, human oversight, privacy and 
+confidentiality, and alignment with audiences. The guidelines demonstrate key areas of AI 
+administrative use and how the processes shall be guided i.e., risk of AI -enhanced cyber and 
+related attacks, compliance oversig ht and accountability, service, information quality and 
+accuracy, legal issues in AI use, and staff training and professional development. 
+18. AI Management 
+18.1 The deployment of AI within UDSM shall comply with national laws, regulations, 
+guidelines and policies; 
+18.2 The University shall focus on the effects of AI on academic and administrative staff, 
+students, and communities in learning , and should strive to help improve the services 
+of all UDSM community members through responsible and effective use of AI in 
+academics and administrative works; 
+18.3 The University shall take proactive measures to prevent risks and negative impacts of 
+AI on intended users and the institution; 
+18.4 A privacy impact assessment shall be carried out where AI systems use or analyze 
+personal data, including sensitive and private information of staff and students of the 
+University. Staff and students are encouraged to protect personal data through focused 
+data collection and respecting user permissions; 
+18.5 Administrative staff shall ensure that relevant data is used and collected through legal 
+and ethical means, and that the data provenance is documented and managed; 
+18.6 DICT shall ensure that all ICT systems of the University undergo regular testing and 
+risk mitigation to demonstrate their safety and effectiveness for intended use , and that 
+information and data of the University are not retrieved by AI systems or found in public 
+domains; 
+18.7 The UDSM Quality Assur ance Bureau shall any integration of AI into research, 
+teaching and learning, consultancy, or administration is monitored, evaluated, and 
+reported; 
+18.8 The UDSM Center for Continuing Education shall ensure regular capacity building 
+programmes on AI across all Units of the University;
+
+--- Page 18 ---
+18.9 The University shall ensure that there is meaningful human oversight and clear lines of 
+authority over AI system deployment, use, and impacts , and shall ensure that AI 
+governance processes are documented, maintained, rev iewed, and updated to ensure 
+accountability; 
+18.10 The University shall ensure that there are additional safeguards and that contingency 
+processes are in place to handle failures or incidents with high-risk systems; 
+18.11 The university shall ensure that systems are d eployed in consultation with diverse 
+stakeholders to identify risks , and that clear and adequate information should be 
+provided to users regarding AI system capabilities and limitations. 
+19. Risks of AI-Enhanced Cyber and Related Attacks 
+19.1 The University shall remain vigilant, implementing good contract oversight and robust 
+security measures and fostering a culture of cybersecurity awareness to safeguard 
+against any evolving risks associated with external AI utilization; 
+19.2 The University shall ensure that training and awareness campaigns for staff as well as 
+students remain a critical component of mitigating external threat risks. 
+20. Compliance Oversight and Accountability 
+20.1 The University shall ensure that Colleges, Schools, Institutes, major departments and 
+Directorates across the institution are tasked with compliance, privacy, policy, and 
+governance to address reputational, financial, regulatory, and compliance needs in the 
+AI space. 
+21. Service, Information Quality and Accuracy 
+21.1 The University shall ensure that appropriate staffing and training, with a focus on 
+auditing and evaluating the training data and output of the AI tools, are provided to staff 
+and students; 
+21.2 DICT shall ensure a mandatory, documented testing, and quality assurance plan per AI 
+solution is recommended as part of IT governance. A mechanism for users to report 
+concerns and allow for analysis by units running the tools is critical; 
+21.3 Users shall be advised that , despite compelling and authoritative presentations, AI 
+outputs must be validated. 
+22. Legal Issues in AI Use 
+22.1 Staff and students shall be warned that hasty or disordered deployment of AI for 
+administrative purposes could lead to consequences , such as bias in decision -making, 
+plagiarism, and violation of privacy laws. 
+23. Staff Training and Professional Development 
+23.1 The University shall ensure that staff have the appropriate training and skills to 
+effectively use AI tools within administrative contexts; 
+23.2 The University leadership and management shall enforce human oversight and 
+expertise to guide and optimize AI-driven processes. 
+24. Amendment and Revision of the Guidelines 
+24.1 The Office of DVC-Research shall monitor and evaluate the effectiveness of these 
+guidelines; 
+24.2 These guidelines shall be reviewed after every three years from its approval; 
+24.3 Where implementation challenges have been identified, the University shall revise the 
+clauses accordingly and make necessary amendments.
+
+--- Page 19 ---
+25. Financial Implications 
+Implementing these guidelines has financial implications. Therefore, units shall allocate a 
+dedicated budget to ensure effective implementation. The budget items include the following: 
+o Professional training to the staff members under relevant units on the ethical use of AI 
+in research, teaching, consultancy, administration; 
+o AI tools (software) for editors , researchers, educators, and administrators ; these AI 
+tools may be procured, obtained through subscription, or developed internally by the 
+UDSM Units; 
+o Publication and distribution of the guidelines across departments and sections under 
+UDSM Units.
+
+--- Page 20 ---
+BIBLIOGRAPHY 
+Carayannis, E. G. and Grigoroudis, E. Introduction to the Handbook of Research on Artificial Intelligence, 
+Innovation and Entrepreneurship. The Edward Elgar, 2023. 
+https://doi.org/10.4337/9781839106750.00006. 
+ 
+Copyright and Neighbouring Rights Act of Tanzania (1999), http://parliament.go.tz/. 
+ 
+Cornell University (2023) Generative AI in Academic Research: Perspectives and Cultural Norms, 
+https://it.cornell.edu/sites/default/files/itc-drupal10files/Generative%20AI%20in%20Research_%20Cornell%20Task%20Force%20ReportDec2023.pdf 
+ 
+Cornell University (2023) Generative Artificial Intelligence for Education and Pedagogy, 
+https://teaching.cornell.edu/sites/default/files/2023-08/Cornell-GenerativeAIForEducationReport_2.pdf 
+ 
+Cornell University (2024) Genera tive AI in Administration, https://it.cornell.edu/sites/default/files/itcdrupal10files/Cornell%20Generative%20AI%20in%20Administration%20Task%20Force%20ReportJan2024_1.pdf 
+ 
+Flanagin A, Pirracchio R, Khera R, Berkwits M, Hswen Y, Bibbins-Domingo K. Reporting Use of AI in 
+Research and Scholarly Publication—JAMA Network Guidance. JAMA. 2024;331(13):1096–1098. 
+doi:10.1001/jama.2024.3471 
+ 
+Hou, Stephen M., International Patent Office Guidance on Artificial Intelligence Inventions (May 15, 2024). 
+Available at SSRN: https://ssrn.com/abstract=4843648 or http://dx.doi.org/10.2139/ssrn.4843648 
+ 
+Lin, Z. Beyond principlism: practical strategies for ethical AI use in research practices. AI Ethics (2024). 
+https://doi.org/10.1007/s43681-024-00585-5 
+ 
+National Guidelines for Artificial Intelligence in Education (2024). Ministry of Education, Science and 
+Technology. 
+ 
+National Digital Education Guidelines for Universities (2025). Ministry of Education, Science and 
+Technology. 
+ 
+National Digital Education Strategy (2024/25 – 2029/30). Ministry of Education, Science and Technology. 
+ 
+Saba, D., Sahli, Y., Maouedj, R., Hadi di, A., Medjahed, M.B. (2021). Towards Artificial Intelligence: 
+Concepts, Applications, and Innovations. In: Hassanien, AE., Taha, M.H.N., Khalifa, N.E.M. (eds) 
+Enabling AI Applications in Data Science. Studies in Computational Intelligence, vol 911. Springer, 
+Cham. https://doi.org/10.1007/978-3-030-52067-0_6 
+ 
+The Africa Declaration on Artificial Intelligence (2025), Global AI Summit on Africa . 
+https://aiexpoafrica.com/africa-declaration-on-artificial-intelligence/ 
+ 
+UDSM Consultancy Policy and Operational Procedures (1994, Revised 2024) 
+ 
+UDSM Guidelines for Commercialization of Intellectual Property, Innovation and Research Products (2022) 
+ 
+UDSM Journal Policy & Guidelines (2024). 
+ 
+UDSM Policy on Intellectual Property (2008, Revised 2022).
+
+--- Page 21 ---
+APPENDIX 
+ 
+DECLARATION FOR USE OF AI IN SCIENTIFIC WRITING 
+(Note: AI threshold should be less than 30%) 
+ 
+1. Primary Contact Details 
+Name 
+Title 
+College/School/Institute 
+Department (If Applicable) 
+Email 
+ 
+2. Declaration of Use of Artificial Intelligence in (Tick appropriate): 
+ Research project proposal Dissertation 
+ Grant funding proposal Book chapter 
+ Journal Article Report 
+ No use of Artificial Intelligence Other: ……………………………………… 
+ 
+3. List of AI tools/systems used (indicate links, model/tool name, and manufacturer) 
+ 
+4. Specific use of the AI tools/systems in your work 
+ 
+ 
+5. Systematic steps on how the AI tool was used 
+ 
+ 
+6. How have you used and/changed the generated AI output? 
+ 
+ 
+7. What is the proportion (%) of AI content? 
+ 
+ 
+ 
+ 
+ 
+Date: …………………………………… Signature: ……………………….

@@ -4,6 +4,7 @@ import {
   fetchModelInfo as apiFetchModelInfo,
   fetchSessions as apiFetchSessions,
   fetchHistory,
+  submitFeedback as apiSubmitFeedback,
 } from '../services/api';
 import { useAuth } from './AuthContext';
 
@@ -99,7 +100,7 @@ export function ChatProvider({ children }) {
     } catch { /* backend offline */ }
   }, [currentSessionId, isLoading]);
 
-  const sendMessage = useCallback(async (content) => {
+  const sendMessage = useCallback(async (content, { model, fileContext } = {}) => {
     if (!content.trim() || isLoading) return;
 
     const userMsg = {
@@ -121,12 +122,17 @@ export function ChatProvider({ children }) {
     setIsLoading(true);
 
     try {
-      for await (const event of streamQuestion(content.trim(), currentSessionId)) {
+      for await (const event of streamQuestion(content.trim(), currentSessionId, { model, fileContext })) {
         if (event.error) {
           setMessages(prev => prev.map(m =>
             m.id === botId ? { ...m, content: event.error, isError: true, streaming: false } : m,
           ));
           return;
+        }
+        if (event.refs) {
+          setMessages(prev => prev.map(m =>
+            m.id === botId ? { ...m, refs: event.refs } : m,
+          ));
         }
         if (event.token) {
           setMessages(prev => prev.map(m =>
@@ -135,7 +141,12 @@ export function ChatProvider({ children }) {
         }
         if (event.done) {
           setMessages(prev => prev.map(m =>
-            m.id === botId ? { ...m, streaming: false, responseTime: event.response_time } : m,
+            m.id === botId ? {
+              ...m,
+              streaming: false,
+              responseTime: event.response_time,
+              messageIndex: event.message_index,
+            } : m,
           ));
           loadSessions();
         }
@@ -157,6 +168,12 @@ export function ChatProvider({ children }) {
     createNewSession();
   }, [currentSessionId, createNewSession]);
 
+  const deleteSession = useCallback(async (sessionId) => {
+    try { await clearHistory(sessionId); } catch { /* offline */ }
+    if (sessionId === currentSessionId) createNewSession();
+    await loadSessions();
+  }, [currentSessionId, createNewSession, loadSessions]);
+
   const fetchModelInfo = useCallback(async () => {
     try {
       const data = await apiFetchModelInfo();
@@ -164,11 +181,20 @@ export function ChatProvider({ children }) {
     } catch { /* offline */ }
   }, []);
 
+  const submitFeedback = useCallback(async (messageIndex, rating) => {
+    try {
+      await apiSubmitFeedback(currentSessionId, messageIndex, rating);
+      setMessages(prev => prev.map(m =>
+        m.messageIndex === messageIndex ? { ...m, feedback: rating } : m,
+      ));
+    } catch { /* ignore — feedback is non-critical */ }
+  }, [currentSessionId]);
+
   return (
     <ChatContext.Provider value={{
       messages, isLoading, modelInfo, sessions, currentSessionId,
       sendMessage, clearMessages, fetchModelInfo,
-      createNewSession, switchSession, loadSessions,
+      createNewSession, switchSession, loadSessions, submitFeedback, deleteSession,
     }}>
       {children}
     </ChatContext.Provider>

@@ -57,7 +57,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
               Email address
             </label>
             <input
@@ -72,7 +72,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
               Password
             </label>
             <div className="relative">
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        <p className="text-[11px] text-center text-zinc-400 dark:text-zinc-600 mt-4">
+        <p className="text-xs text-center text-zinc-400 dark:text-zinc-600 mt-4">
           Having trouble?{' '}
           <a href="mailto:helpdesk@udsm.ac.tz" className="text-amber-500 dark:text-amber-400 hover:underline">
             Contact ICT Helpdesk
@@ -113,7 +113,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <p className="text-[11px] text-zinc-400 dark:text-zinc-700 mt-6 text-center">
+      <p className="text-xs text-zinc-400 dark:text-zinc-700 mt-6 text-center">
         University of Dar es Salaam &copy; {new Date().getFullYear()}
       </p>
     </div>
