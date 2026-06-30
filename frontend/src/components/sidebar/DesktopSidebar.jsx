@@ -1,11 +1,13 @@
-import React from 'react';
 import { ChevronLeft, ChevronRight, Plus, MessageSquare } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { HISTORY_ITEMS } from '../../data/constants';
+import { relativeDate } from '../../utils/format';
+import { useChat } from '../../contexts/ChatContext';
 import ProfileMenu from './ProfileMenu';
 import udsmLogo from '../../assets/udsm.png';
 
-export default function DesktopSidebar({ collapsed, onToggle, modelInfo, onLogout }) {
+export default function DesktopSidebar({ collapsed, onToggle }) {
+  const { sessions, currentSessionId, createNewSession, switchSession } = useChat();
+
   return (
     <aside className={cn(
       'hidden md:block flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 overflow-hidden transition-[width] duration-300',
@@ -41,46 +43,54 @@ export default function DesktopSidebar({ collapsed, onToggle, modelInfo, onLogou
         {/* New Chat */}
         <div className={cn('border-b border-gray-200 dark:border-zinc-800', collapsed ? 'px-2 py-3' : 'p-3')}>
           {collapsed ? (
-            <button title="New Chat"
+            <button onClick={createNewSession} title="New Chat"
               className="w-full flex items-center justify-center p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:border-zinc-700/60 text-zinc-600 dark:text-zinc-300 transition-colors">
               <Plus className="w-5 h-5" />
             </button>
           ) : (
-            <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-200 text-sm font-medium transition-colors">
+            <button onClick={createNewSession}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-200 text-sm font-medium transition-colors">
               <Plus className="w-4 h-4" />
               New Chat
             </button>
           )}
         </div>
 
-        {/* History */}
+        {/* Session history */}
         <nav className={cn('flex-1 overflow-y-auto space-y-0.5', collapsed ? 'p-2' : 'p-3')}>
-          {!collapsed && (
+          {!collapsed && sessions.length > 0 && (
             <p className="px-2 pb-1 pt-2 text-[10px] uppercase tracking-widest text-zinc-400 dark:text-zinc-600 font-semibold">
               Recent
             </p>
           )}
-          {HISTORY_ITEMS.map(item => (
-            <button key={item.id} title={collapsed ? item.title : undefined}
-              className={cn(
-                'w-full flex items-center rounded-xl text-left transition-colors',
-                collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
-                item.active
-                  ? 'bg-gray-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
-                  : 'text-zinc-500 hover:bg-gray-100/70 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300',
-              )}>
-              <MessageSquare className={cn('flex-shrink-0 opacity-60', collapsed ? 'w-5 h-5' : 'w-4 h-4')} />
-              {!collapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{item.title}</p>
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-0.5">{item.sub}</p>
-                </div>
-              )}
-            </button>
-          ))}
+          {sessions.map(session => {
+            const active = session.session_id === currentSessionId;
+            return (
+              <button key={session.session_id}
+                onClick={() => switchSession(session.session_id)}
+                title={collapsed ? session.title : undefined}
+                className={cn(
+                  'w-full flex items-center rounded-xl text-left transition-colors',
+                  collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
+                  active
+                    ? 'bg-gray-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
+                    : 'text-zinc-500 hover:bg-gray-100/70 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300',
+                )}>
+                <MessageSquare className={cn('flex-shrink-0 opacity-60', collapsed ? 'w-5 h-5' : 'w-4 h-4')} />
+                {!collapsed && (
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{session.title}</p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-0.5">
+                      {session.last_used ? relativeDate(session.last_used) : ''}
+                    </p>
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        <ProfileMenu collapsed={collapsed} onLogout={onLogout} />
+        <ProfileMenu collapsed={collapsed} />
       </div>
     </aside>
   );

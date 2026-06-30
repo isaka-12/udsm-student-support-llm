@@ -1,3 +1,36 @@
-# virtual environment
+# Python
 venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files — never commit real credentials
+.env
+.env.local
+.env.*.local
+mongoDB/.env
+
+# Logs — may contain sensitive student data
+*.log
+logs/
+backend/logs/app.log
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Tooling
 CLAUDE.md
+
+# Assignment report — personal work, not for version control
+docs/report.md

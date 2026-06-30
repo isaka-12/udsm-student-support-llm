@@ -1,11 +1,16 @@
-import React from 'react';
 import { Plus, MessageSquare, X } from 'lucide-react';
 import udsmLogo from '../../assets/udsm.png';
 import { cn } from '../../utils/cn';
-import { HISTORY_ITEMS } from '../../data/constants';
+import { relativeDate } from '../../utils/format';
+import { useChat } from '../../contexts/ChatContext';
 import ProfileMenu from './ProfileMenu';
 
-export default function MobileSidebar({ open, onClose, onLogout }) {
+export default function MobileSidebar({ open, onClose }) {
+  const { sessions, currentSessionId, createNewSession, switchSession } = useChat();
+
+  const handleNewChat = () => { createNewSession(); onClose(); };
+  const handleSwitch  = (id) => { switchSession(id); onClose(); };
+
   return (
     <div className={cn('fixed inset-0 z-50 md:hidden', !open && 'pointer-events-none')}>
       {/* Backdrop */}
@@ -37,35 +42,44 @@ export default function MobileSidebar({ open, onClose, onLogout }) {
 
         {/* New Chat */}
         <div className="p-3 border-b border-gray-200 dark:border-zinc-800">
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-200 text-sm font-medium transition-colors">
+          <button onClick={handleNewChat}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-200 text-sm font-medium transition-colors">
             <Plus className="w-4 h-4" />
             New Chat
           </button>
         </div>
 
-        {/* History */}
+        {/* Session history */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
-          <p className="px-2 pb-1 pt-2 text-[10px] uppercase tracking-widest text-zinc-400 dark:text-zinc-600 font-semibold">
-            Recent
-          </p>
-          {HISTORY_ITEMS.map(item => (
-            <button key={item.id}
-              className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors',
-                item.active
-                  ? 'bg-gray-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
-                  : 'text-zinc-500 hover:bg-gray-100/70 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300',
-              )}>
-              <MessageSquare className="w-4 h-4 flex-shrink-0 opacity-60" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{item.title}</p>
-                <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-0.5">{item.sub}</p>
-              </div>
-            </button>
-          ))}
+          {sessions.length > 0 && (
+            <p className="px-2 pb-1 pt-2 text-[10px] uppercase tracking-widest text-zinc-400 dark:text-zinc-600 font-semibold">
+              Recent
+            </p>
+          )}
+          {sessions.map(session => {
+            const active = session.session_id === currentSessionId;
+            return (
+              <button key={session.session_id}
+                onClick={() => handleSwitch(session.session_id)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors',
+                  active
+                    ? 'bg-gray-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
+                    : 'text-zinc-500 hover:bg-gray-100/70 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300',
+                )}>
+                <MessageSquare className="w-4 h-4 flex-shrink-0 opacity-60" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate">{session.title}</p>
+                  <p className="text-[10px] text-zinc-400 dark:text-zinc-600 mt-0.5">
+                    {session.last_used ? relativeDate(session.last_used) : ''}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </nav>
 
-        <ProfileMenu collapsed={false} onLogout={onLogout} />
+        <ProfileMenu collapsed={false} />
       </div>
     </div>
   );
