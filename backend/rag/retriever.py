@@ -10,7 +10,7 @@ async def retrieve(question: str) -> tuple[list[str], list[dict]]:
     """
     try:
         embedding = await embedder.embed(question)
-        chunks, refs = await store.query(embedding, top_k=RAG_TOP_K)
+        chunks, refs = await store.query(embedding, question, top_k=RAG_TOP_K)
         if chunks:
             logger.info("RAG | %d chunks | q=%.80s", len(chunks), question)
         return chunks, refs

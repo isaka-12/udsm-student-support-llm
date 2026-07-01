@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
@@ -7,18 +8,21 @@ from passlib.context import CryptContext
 
 from backend.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from backend.database.database import get_user
+from backend.logs.logs import logger
 
 pwd_context     = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme   = HTTPBearer()
 _optional_scheme = HTTPBearer(auto_error=False)
 
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+async def hash_password(password: str) -> str:
+    # bcrypt is CPU-bound (~100-300ms); off the event loop so it doesn't
+    # stall other requests (e.g. in-flight SSE streams) while it runs.
+    return await asyncio.to_thread(pwd_context.hash, password)
 
 
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+async def verify_password(plain: str, hashed: str) -> bool:
+    return await asyncio.to_thread(pwd_context.verify, plain, hashed)
 
 
 def create_access_token(email: str, expires_delta: timedelta | None = None) -> str:
@@ -70,4 +74,10 @@ async def get_optional_user(
             return None
         return {"email": user["email"]}
     except JWTError:
+        return None
+    except Exception as exc:
+        # Auth is optional here (unlike get_current_user) — a transient
+        # DB hiccup (e.g. Mongo briefly unreachable/slow) should degrade
+        # to an anonymous request, not take down the whole /ask call.
+        logger.warning("get_optional_user: treating as anonymous after error: %s", exc)
         return None

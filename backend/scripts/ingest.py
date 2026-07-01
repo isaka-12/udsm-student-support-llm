@@ -29,6 +29,22 @@ MIN_CHUNK_LEN = 60
 UPSERT_BATCH  = 500
 
 _RE_PAGE_MARKER = re.compile(r'^--- Page (\d+) ---$', re.MULTILINE)
+_RE_TOC_DOTS    = re.compile(r'\.{4,}\s*\d{1,4}')
+_RE_LIST_ITEM   = re.compile(
+    r'(?=(?:College of|School of|Institute of|Directorate of|Department of|'
+    r'Faculty of|Centre for)\s+[A-Z])'
+)
+
+
+def _is_toc_page(text: str) -> bool:
+    """
+    Table-of-contents pages are dense dot-leader lists ('HEADING ..... 123').
+    They're pure navigation noise — the same headings appear as real body
+    text on their own dedicated pages — and indexing them wastes a chunk
+    slot with a low-information embedding that crowds out genuine content
+    in top-k retrieval.
+    """
+    return len(_RE_TOC_DOTS.findall(text)) >= 5
 
 
 # ── Text loading ───────────────────────────────────────────────────────────────
@@ -44,7 +60,7 @@ def load_txt(path: Path) -> list[tuple[int, str]]:
         start = m.end()
         end   = markers[i + 1].start() if i + 1 < len(markers) else len(content)
         text  = content[start:end].strip()
-        if len(text) >= MIN_CHUNK_LEN:
+        if len(text) >= MIN_CHUNK_LEN and not _is_toc_page(text):
             pages.append((page_num, text))
     return pages
 
@@ -55,6 +71,38 @@ def _sentence_split(text: str) -> list[str]:
     return [s.strip() for s in re.split(r'(?<=[.!?])\s+', text) if s.strip()]
 
 
+def _hard_wrap(text: str, limit: int) -> list[str]:
+    """Last-resort fixed-width split (nearest whitespace) for text with no
+    usable punctuation boundaries at all."""
+    if len(text) <= limit:
+        return [text]
+    cut = text.rfind(' ', 0, limit)
+    if cut <= 0:
+        cut = limit
+    return [text[:cut].strip()] + _hard_wrap(text[cut:].strip(), limit)
+
+
+def _split_oversized(unit: str) -> list[str]:
+    """
+    Directory/programme listings ('College of X BSc in Y BSc in Z College
+    of W BA in ...') often run on for 1000+ chars with no sentence-ending
+    punctuation, so _sentence_split alone can't break them up. Left as one
+    chunk, they mash several unrelated colleges together into a single
+    diluted embedding — which is exactly why "what are the colleges and
+    schools at UDSM" failed to retrieve anything useful. Split on entity
+    boundaries first, then hard-wrap as a final fallback.
+    """
+    if len(unit) <= CHUNK_TARGET:
+        return [unit]
+    parts = [p.strip() for p in _RE_LIST_ITEM.split(unit) if p.strip()]
+    if len(parts) > 1:
+        out: list[str] = []
+        for p in parts:
+            out.extend(_split_oversized(p))
+        return out
+    return _hard_wrap(unit, CHUNK_TARGET)
+
+
 def chunk_text(text: str) -> list[str]:
     paragraphs = [p.strip() for p in re.split(r'\n{2,}', text) if p.strip()]
     units: list[str] = []
@@ -62,7 +110,8 @@ def chunk_text(text: str) -> list[str]:
         if len(para) <= CHUNK_TARGET:
             units.append(para)
         else:
-            units.extend(_sentence_split(para))
+            for sentence in _sentence_split(para):
+                units.extend(_split_oversized(sentence))
 
     chunks: list[str] = []
     buf: list[str] = []

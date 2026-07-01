@@ -22,16 +22,16 @@ SYSTEM_PROMPT = """\
 You are UDSM Assistant, the official student support chatbot for the University of Dar es Salaam.
 
 OUTPUT FORMAT — strict:
-- Write only the answer. No labels such as "Answer:", "Question:", "Response:".
+- Write only the answer. No labels, headings, or titles of any kind before the answer (not "Answer:", not "Question:", not a made-up heading like "Semester Dates:").
 - Do not echo or repeat the question.
 - Do not include filenames, document names, or page numbers in your answer.
 - No greetings, no filler phrases ("certainly", "great question", "of course").
 
 RESPONSE LENGTH:
-- Factual (what is, how much, who, when): ONE or TWO sentences maximum.
+- Factual (what is, how much, who, when): ONE or TWO sentences maximum. State the fact and stop — do not add reasoning, background, or "this is because..." explanations that are not themselves stated in the context.
 - Steps (how to, process): numbered list, maximum 5 items.
 - Complex (explain, compare): 3 short paragraphs maximum.
-- Never pad, elaborate, or add unsolicited advice beyond what was asked.
+- Never pad, elaborate, speculate, or add unsolicited advice beyond what was asked. If the context does not say WHY something is the case, do not guess a reason.
 
 EXAMPLE — AI policy:
 Students may use AI-generated content for up to **30%** of any academic work.
@@ -65,15 +65,33 @@ def pending_count() -> int:
     return MAX_CONCURRENT - _semaphore._value if _semaphore else 0
 
 
+_RE_LEAD_LABEL = re.compile(
+    r"^(?:[A-Z][\w&/'-]*\s+){0,5}[A-Z][\w&/'-]*\s*[:\-]\s*"
+)
+
+
+def _strip_lead_labels(text: str, max_passes: int = 2) -> str:
+    """
+    Strip a heading/label the model prepended despite being told to write
+    only the answer (e.g. "K: Semester End Dates - The end date is...").
+    Requires an unbroken run of up to 6 Title-Case words immediately
+    followed by ':' or '-', so ordinary sentences ("Students must first
+    register online: ...") aren't affected — real prose has lowercase
+    function words breaking the run before any colon/dash.
+    Runs a couple of passes since models sometimes chain two labels
+    ("K:" then "Semester End Dates -").
+    """
+    for _ in range(max_passes):
+        stripped = _RE_LEAD_LABEL.sub("", text, count=1)
+        if stripped == text:
+            break
+        text = stripped
+    return text
+
+
 def _clean(text: str) -> str:
     text = text.strip()
-    # Strip leading role labels
-    text = re.sub(
-        r"^(Assistant|UDSM\s+Assistant|Answer|Response)\s*:\s*",
-        "",
-        text,
-        flags=re.IGNORECASE,
-    )
+    text = _strip_lead_labels(text)
     # Strip "Question: ... Answer:" echo — greedy up to Answer: (handles straight/curly quotes)
     text = re.sub(
         r'^Question\s*:.*?Answer\s*:\s*',

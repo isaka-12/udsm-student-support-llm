@@ -1,5 +1,6 @@
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from pymongo import ReturnDocument
 from backend.config import MONGODB_URL, MONGODB_DB, SESSION_TTL_DAYS, MAX_HISTORY
 
 _client: AsyncIOMotorClient | None = None
@@ -56,6 +57,36 @@ async def append_message(
         update,
         upsert=True,
     )
+
+
+async def append_user_message_and_get_history(
+    session_id: str, question: str, user_email: str | None = None
+) -> tuple[list[dict], bool]:
+    """
+    Appends the user's question and returns (updated_history, is_first_message)
+    in a single round-trip, instead of count + append + re-fetch.
+    """
+    db = get_db()
+    msg = {
+        "role": "user",
+        "content": question,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    update: dict = {
+        "$push": {"messages": {"$each": [msg], "$slice": -MAX_HISTORY}},
+        "$set": {"last_used": datetime.utcnow()},
+    }
+    if user_email:
+        update["$set"]["user_email"] = user_email
+    doc = await db.sessions.find_one_and_update(
+        {"session_id": session_id},
+        update,
+        upsert=True,
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0, "messages": 1},
+    )
+    history = doc["messages"]
+    return history, len(history) == 1
 
 
 async def update_message_feedback(

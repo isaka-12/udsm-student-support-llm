@@ -53,7 +53,7 @@ async def register(body: UserCreate):
         raise HTTPException(status_code=422, detail="Password must be at least 8 characters")
     if await db.get_user(email):
         raise HTTPException(status_code=409, detail="Email already registered")
-    await db.create_user(email, hash_password(body.password), first, last)
+    await db.create_user(email, await hash_password(body.password), first, last)
     logger.info("New user registered: %s", email)
     return AuthResponse(
         access_token=create_access_token(email),
@@ -65,7 +65,7 @@ async def register(body: UserCreate):
 async def login(body: UserLogin):
     email = body.email.strip().lower()
     user  = await db.get_user(email)
-    if not user or not verify_password(body.password, user["hashed_password"]):
+    if not user or not await verify_password(body.password, user["hashed_password"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     logger.info("User logged in: %s", email)
     return AuthResponse(
@@ -148,12 +148,15 @@ async def ask(req: AskRequest, current_user: dict | None = Depends(get_optional_
     session_id = req.session_id or "default"
     user_email = current_user["email"] if current_user else None
     logger.info("Question received | session=%s | user=%s | q=%.120s", session_id, user_email or "anon", question)
-    is_first = (await db.get_session_message_count(session_id)) == 0
-    await db.append_message(session_id, "user", question, user_email=user_email)
+
+    # DB append (returns the updated history in one round-trip) and RAG
+    # retrieval are independent — run them concurrently.
+    (history, is_first), (context, refs) = await asyncio.gather(
+        db.append_user_message_and_get_history(session_id, question, user_email=user_email),
+        retrieve(question),
+    )
     if is_first:
         asyncio.create_task(_generate_and_save_title(session_id, question))
-    history          = await db.get_session_messages(session_id)
-    context, refs    = await retrieve(question)
     messages         = llm_client.build_messages(history, context, file_context=req.file_context)
     msg_index        = len(history)
     start            = time.time()
@@ -220,9 +223,15 @@ async def submit_feedback(req: FeedbackRequest):
 
 # ── Available models ───────────────────────────────────────────────────────────
 
+# Embedding-only models (e.g. nomic-embed-text, bge-*, e5-*) can't do chat
+# completion — they'd break generation if selected, so keep them out of the
+# user-facing model picker.
+_RE_EMBEDDING_MODEL = re.compile(r"embed|bge-|(?:^|-)e5-|gte-|minilm", re.IGNORECASE)
+
+
 @router.get("/models")
 async def list_models():
-    """List locally available Ollama models."""
+    """List locally available Ollama models capable of chat completion."""
     from backend.config import LLM_API_URL, LLM_MODEL
     base = LLM_API_URL.rsplit("/api/", 1)[0]
     try:
@@ -231,7 +240,10 @@ async def list_models():
             timeout=httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0),
         )
         resp.raise_for_status()
-        models = [m["name"] for m in resp.json().get("models", [])]
+        models = [
+            m["name"] for m in resp.json().get("models", [])
+            if not _RE_EMBEDDING_MODEL.search(m["name"])
+        ]
         return {"models": models or [LLM_MODEL], "current": LLM_MODEL}
     except Exception:
         return {"models": [LLM_MODEL], "current": LLM_MODEL}
@@ -266,6 +278,10 @@ async def extract_file(file: UploadFile = File(...)):
 
 _RE_HYPHEN = re.compile(r'(\w)-\n(\w)')
 _RE_NUM    = re.compile(r'^\s*\d{1,4}\s*$', re.MULTILINE)
+_RE_LIST_ITEM = re.compile(
+    r'(?=(?:College of|School of|Institute of|Directorate of|Department of|'
+    r'Faculty of|Centre for)\s+[A-Z])'
+)
 
 CHUNK_TARGET  = 600
 CHUNK_OVERLAP = 100
@@ -280,6 +296,30 @@ def _clean_text(text: str) -> str:
     return text.strip()
 
 
+def _hard_wrap(text: str, limit: int) -> list[str]:
+    if len(text) <= limit:
+        return [text]
+    cut = text.rfind(' ', 0, limit)
+    if cut <= 0:
+        cut = limit
+    return [text[:cut].strip()] + _hard_wrap(text[cut:].strip(), limit)
+
+
+def _split_oversized(unit: str) -> list[str]:
+    """Directory/listing text with no sentence punctuation (e.g. 'College
+    of X ... College of Y ...') would otherwise stay as one oversized,
+    semantically diluted chunk spanning multiple unrelated entities."""
+    if len(unit) <= CHUNK_TARGET:
+        return [unit]
+    parts = [p.strip() for p in _RE_LIST_ITEM.split(unit) if p.strip()]
+    if len(parts) > 1:
+        out: list[str] = []
+        for p in parts:
+            out.extend(_split_oversized(p))
+        return out
+    return _hard_wrap(unit, CHUNK_TARGET)
+
+
 def _chunk(text: str) -> list[str]:
     paragraphs = [p.strip() for p in re.split(r'\n{2,}', text) if p.strip()]
     units: list[str] = []
@@ -287,7 +327,10 @@ def _chunk(text: str) -> list[str]:
         if len(para) <= CHUNK_TARGET:
             units.append(para)
         else:
-            units.extend(s.strip() for s in re.split(r'(?<=[.!?])\s+', para) if s.strip())
+            for sentence in re.split(r'(?<=[.!?])\s+', para):
+                sentence = sentence.strip()
+                if sentence:
+                    units.extend(_split_oversized(sentence))
     chunks: list[str] = []
     buf: list[str] = []
     buf_len = 0

@@ -5,6 +5,8 @@ import { fetchModels } from '../../services/api';
 import { cn } from '../../utils/cn';
 import UploadModal from './UploadModal';
 
+const SELECTED_MODEL_KEY = 'udsm_selected_model';
+
 export default function ChatInput({ input, setInput }) {
   const { isLoading, sendMessage } = useChat();
   const textareaRef  = useRef(null);
@@ -15,11 +17,21 @@ export default function ChatInput({ input, setInput }) {
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [uploadOpen, setUploadOpen]       = useState(false);
 
+  const chooseModel = useCallback((model) => {
+    setSelectedModel(model);
+    setModelMenuOpen(false);
+    localStorage.setItem(SELECTED_MODEL_KEY, model);
+  }, []);
+
   useEffect(() => {
     fetchModels()
       .then(data => {
-        setModels(data.models || []);
-        setSelectedModel(data.current || null);
+        const available = data.models || [];
+        setModels(available);
+        // Restore the last-picked model if it's still available locally,
+        // otherwise fall back to the backend's configured default.
+        const saved = localStorage.getItem(SELECTED_MODEL_KEY);
+        setSelectedModel(saved && available.includes(saved) ? saved : (data.current || null));
       })
       .catch(() => {});
   }, []);
@@ -59,7 +71,7 @@ export default function ChatInput({ input, setInput }) {
     <>
       <div className="flex-shrink-0   px-4 sm:px-6  pb-4 bg-transparent">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700/60 focus-within:border-amber-400/60 dark:focus-within:border-amber-500/40 rounded-2xl transition-colors shadow-sm overflow-hidden">
+          <div className="bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700/60 focus-within:border-amber-400/60 dark:focus-within:border-amber-500/40 rounded-2xl transition-colors shadow-sm">
 
             {/* Text area */}
             <div className="px-4 pt-3 pb-1">
@@ -97,7 +109,7 @@ export default function ChatInput({ input, setInput }) {
                         return (
                           <button
                             key={m}
-                            onClick={() => { setSelectedModel(m); setModelMenuOpen(false); }}
+                            onClick={() => chooseModel(m)}
                             className={cn(
                               'w-full flex items-center justify-between gap-3 px-3 py-2 text-xs text-left transition-colors',
                               isActive

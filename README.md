@@ -299,4 +299,4 @@ ollama run phi3
 
 - [backend/README.md](backend/README.md) — module reference, env vars, API, logging, database
 - [frontend/README.md](frontend/README.md) — component tree, routes, state management, commands
-- [docs/report.md](docs/report.md) — IS 365 assignment report guide with reflection answers
+

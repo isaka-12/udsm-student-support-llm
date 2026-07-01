@@ -1,8 +1,12 @@
 import os
 import warnings
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Explicit path: load_dotenv() with no args only searches upward from the
+# current working directory, so it silently misses backend/.env when the
+# app is launched from the project root (the documented `uvicorn` command).
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 # LLM / Ollama
 LLM_MODEL       = os.getenv("LLM_MODEL",    "phi3:latest")
