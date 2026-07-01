@@ -99,6 +99,24 @@ export async function fetchModels() {
   return res.json();
 }
 
+export async function fetchQuickQuestions() {
+  const res = await apiFetch('/quick-questions');
+  if (!res || !res.ok) return { questions: [] };
+  return res.json();
+}
+
+export async function fetchKnowledgeBase() {
+  const res = await apiFetch('/admin/knowledge-base');
+  if (!res || !res.ok) throw new Error('Failed to fetch knowledge base');
+  return res.json();
+}
+
+export async function fetchLogs(limit = 300) {
+  const res = await apiFetch(`/admin/logs?limit=${limit}`);
+  if (!res || !res.ok) throw new Error('Failed to fetch logs');
+  return res.json();
+}
+
 export async function ingestFile(file) {
   const token = getToken();
   const form  = new FormData();

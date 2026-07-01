@@ -1,17 +1,14 @@
-import { useState } from 'react';
-import { Plus, X, Trash2 } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import udsmLogo from '../../assets/udsm.png';
 import { cn } from '../../utils/cn';
-import { relativeDate } from '../../utils/format';
 import { useChat } from '../../contexts/ChatContext';
 import ProfileMenu from './ProfileMenu';
+import SessionList from './SessionList';
 
 export default function MobileSidebar({ open, onClose }) {
   const { sessions, currentSessionId, createNewSession, switchSession, deleteSession } = useChat();
-  const [hoveredId, setHoveredId] = useState(null);
 
   const handleNewChat = () => { createNewSession(); onClose(); };
-  const handleSwitch  = (id) => { switchSession(id); onClose(); };
 
   return (
     <div className={cn('fixed inset-0 z-50 md:hidden', !open && 'pointer-events-none')}>
@@ -53,53 +50,14 @@ export default function MobileSidebar({ open, onClose }) {
         </div>
 
         {/* Session history */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
-          {sessions.length > 0 && (
-            <p className="px-2 pb-1 pt-2 text-xs uppercase tracking-widest text-zinc-400 dark:text-zinc-600 font-semibold">
-              Recent
-            </p>
-          )}
-          {sessions.map(session => {
-            const active  = session.session_id === currentSessionId;
-            const hovered = hoveredId === session.session_id;
-            return (
-              <div
-                key={session.session_id}
-                className="relative"
-                onTouchStart={() => setHoveredId(session.session_id)}
-                onMouseEnter={() => setHoveredId(session.session_id)}
-                onMouseLeave={() => setHoveredId(null)}
-              >
-                <button
-                  onClick={() => handleSwitch(session.session_id)}
-                  className={cn(
-                    'w-full flex items-center px-3 py-2.5 rounded-xl text-left transition-colors',
-                    hovered ? 'pr-10' : '',
-                    active
-                      ? 'bg-gray-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
-                      : 'text-zinc-500 hover:bg-gray-100/70 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300',
-                  )}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{session.title}</p>
-                    <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-0.5">
-                      {session.last_used ? relativeDate(session.last_used) : ''}
-                    </p>
-                  </div>
-                </button>
-
-                {hovered && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); deleteSession(session.session_id); }}
-                    title="Delete"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            );
-          })}
+        <nav className="flex-1 overflow-y-auto p-2">
+          <SessionList
+            sessions={sessions}
+            currentSessionId={currentSessionId}
+            switchSession={switchSession}
+            deleteSession={deleteSession}
+            onSwitch={onClose}
+          />
         </nav>
 
         <ProfileMenu collapsed={false} />

@@ -23,7 +23,7 @@ from backend.auth import (
 )
 from backend.config import LLM_MODEL, MAX_CONCURRENT, NUM_CTX, MAX_HISTORY, CONTEXT_WINDOW
 from backend.database import database as db
-from backend.logs.logs import logger
+from backend.logs.logs import LOG_FILE, logger
 from backend.models.auth_modal import AuthResponse, UserCreate, UserLogin
 from backend.models.chat import AskRequest, FeedbackRequest
 from backend.rag.retriever import retrieve
@@ -170,6 +170,32 @@ async def ask(req: AskRequest, current_user: dict | None = Depends(get_optional_
             "Connection":       "keep-alive",
         },
     )
+
+
+# ── Quick questions ──────────────────────────────────────────────────────────────
+
+# Generating these calls the LLM, so cache the result instead of paying that
+# cost on every homepage load. Invalidated whenever the KB changes (see
+# /ingest-file) so suggestions stay grounded in what's actually indexed.
+_quick_questions_cache: list[str] = []
+_quick_questions_cache_ts: float = 0.0
+QUICK_QUESTIONS_TTL = 6 * 3600  # regenerate periodically even without new ingests
+
+
+@router.get("/quick-questions")
+async def get_quick_questions():
+    global _quick_questions_cache, _quick_questions_cache_ts
+    now = time.time()
+    if not _quick_questions_cache or (now - _quick_questions_cache_ts) > QUICK_QUESTIONS_TTL:
+        try:
+            snippets  = rag_store.sample_snippets(n=6)
+            questions = await llm_client.generate_quick_questions(snippets)
+            if questions:
+                _quick_questions_cache    = questions
+                _quick_questions_cache_ts = now
+        except Exception as exc:
+            logger.warning("quick-questions generation failed: %s", exc)
+    return {"questions": _quick_questions_cache}
 
 
 # ── History ────────────────────────────────────────────────────────────────────
@@ -398,6 +424,10 @@ async def ingest_file(
 
     await rag_store.upsert(ids, embs, docs, metas)
     logger.info("KB ingest | file=%s | chunks=%d | user=%s", filename, len(ids), current_user.get("email", "?"))
+
+    global _quick_questions_cache_ts
+    _quick_questions_cache_ts = 0.0  # force regeneration from the updated KB next time
+
     return {"chunks": len(ids), "filename": filename}
 
 
@@ -414,3 +444,44 @@ async def model_info():
         "max_concurrent_inferences": MAX_CONCURRENT,
         "capabilities": ["question-answering", "student-support", "university-guidance"],
     }
+
+
+# ── Admin: knowledge base + logs ────────────────────────────────────────────────
+
+@router.get("/admin/knowledge-base")
+async def get_knowledge_base(current_user: dict = Depends(get_current_user)):
+    """List ingested documents and their chunk counts, for the settings UI."""
+    sources = rag_store.list_sources()
+    return {"total_chunks": sum(s["chunks"] for s in sources), "sources": sources}
+
+
+_RE_LOG_LINE = re.compile(
+    r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \| "
+    r"(?P<level>\w+)\s*\| (?P<logger>\S+) \| (?P<message>.*)$"
+)
+
+
+@router.get("/admin/logs")
+async def get_logs(limit: int = 300, current_user: dict = Depends(get_current_user)):
+    """Return the most recent parsed log entries (newest first)."""
+    if not LOG_FILE.exists():
+        return {"entries": []}
+
+    raw_lines = LOG_FILE.read_text(encoding="utf-8", errors="ignore").splitlines()
+    entries: list[dict] = []
+    for line in raw_lines:
+        match = _RE_LOG_LINE.match(line)
+        if match:
+            entries.append({
+                "timestamp": match.group("timestamp"),
+                "level":     match.group("level"),
+                "logger":    match.group("logger"),
+                "message":   match.group("message"),
+            })
+        elif entries:
+            # Continuation line (e.g. a traceback) — fold into the entry it belongs to.
+            entries[-1]["message"] += "\n" + line
+
+    entries = entries[-limit:]
+    entries.reverse()
+    return {"entries": entries}

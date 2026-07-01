@@ -1,10 +1,10 @@
-import { Sun, Moon, Trash2, Menu } from 'lucide-react';
+import { Sun, Moon, Menu } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useChat } from '../../contexts/ChatContext';
 
 export default function Header({ onMenuOpen }) {
   const { dark, toggle } = useTheme();
-  const { sessions, currentSessionId, clearMessages } = useChat();
+  const { sessions, currentSessionId } = useChat();
 
   const currentSession = sessions.find(s => s.session_id === currentSessionId);
   const title = currentSession?.title ?? 'New Chat';
@@ -35,14 +35,8 @@ export default function Header({ onMenuOpen }) {
         {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>
 
-      {/* Clear chat */}
-      <button
-        onClick={clearMessages}
-        title="Clear chat"
-        className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-red-500/10 flex-shrink-0 transition-colors"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+      
+      
     </header>
   );
 }

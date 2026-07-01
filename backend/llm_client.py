@@ -205,6 +205,66 @@ async def generate_title(question: str) -> str:
     return _fallback_title(question)
 
 
+_QUICK_QUESTIONS_PROMPT = """\
+You are writing example question suggestions for the homepage of a UDSM \
+student-support chatbot. Below are snippets pulled from real UDSM documents.
+
+For each snippet, write ONE short question a CURRENT STUDENT would \
+personally ask about their OWN studies — admissions, registration, fees, \
+exams, accommodation, deadlines, or requirements. Never ask about staff, \
+committees, meetings, or how the university is internally run.
+
+Good examples (this is the style to match):
+- "How do I register for courses at UDSM?"
+- "What documents do I need for hostel accommodation?"
+- "When does semester two end?"
+- "How much are tuition fees for undergraduates?"
+
+Bad examples (do not write like this):
+- "Who attends the College Board meeting?"
+- "What is the postal address of the registrar?"
+
+Rules:
+- Under 12 words each.
+- Reply with exactly one question per line, in the same order as the snippets.
+- No numbering, no labels, no extra commentary — just the questions.
+- If a snippet has no natural student angle, still write the closest
+  practical question a student could plausibly ask about that topic.
+
+{snippets}
+"""
+
+
+async def generate_quick_questions(snippets: list[str]) -> list[str]:
+    """Generate homepage quick-question suggestions grounded in real KB
+    content. Bypasses the semaphore — fire-and-forget only, called from a
+    cached, infrequently-refreshed endpoint rather than the hot chat path."""
+    if not snippets:
+        return []
+    numbered = "\n\n".join(f"Snippet {i + 1}: {s[:400]}" for i, s in enumerate(snippets))
+    prompt = _QUICK_QUESTIONS_PROMPT.format(snippets=numbered)
+    try:
+        resp = await _http_client.post(
+            LLM_API_URL,
+            json={
+                "model":    LLM_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream":   False,
+                "options":  {"num_predict": 250, "temperature": 0.4},
+            },
+            timeout=httpx.Timeout(connect=10.0, read=120.0, write=10.0, pool=10.0),
+        )
+        resp.raise_for_status()
+        raw = resp.json().get("message", {}).get("content", "")
+        questions = [
+            re.sub(r"^\s*[\d.\-\)]+\s*", "", line).strip().strip("\"'")
+            for line in raw.splitlines()
+        ]
+        return [q for q in questions if 5 <= len(q) <= 150 and q.endswith("?")][:len(snippets)]
+    except Exception:
+        return []
+
+
 async def stream(
     messages: list[dict], start: float, model_override: str | None = None
 ) -> AsyncGenerator[tuple[str, str | None], None]:

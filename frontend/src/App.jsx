@@ -6,6 +6,7 @@ import ProtectedRoute      from './components/auth/ProtectedRoute';
 import LoginPage           from './pages/LoginPage';
 import RegisterPage        from './pages/RegisterPage';
 import ChatPage            from './pages/ChatPage';
+import SettingsPage        from './pages/SettingsPage';
 import './App.css';
 
 const router = createBrowserRouter([
@@ -15,7 +16,8 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-      { path: '/chat', element: <ChatPage /> },
+      { path: '/chat',     element: <ChatPage /> },
+      { path: '/settings', element: <SettingsPage /> },
     ],
   },
 ]);

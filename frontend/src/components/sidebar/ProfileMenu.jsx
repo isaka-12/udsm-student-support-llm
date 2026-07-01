@@ -53,16 +53,16 @@ export default function ProfileMenu({ collapsed }) {
             <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
           </div>
 
-          {[
-            { Icon: UserCircle, label: 'Profile' },
-            { Icon: Settings,   label: 'Preferences' },
-          ].map(({ Icon, label }) => (
-            <button key={label} onClick={() => setOpen(false)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700/60 transition-colors text-left">
-              <Icon className="w-4 h-4 opacity-60" />
-              {label}
-            </button>
-          ))}
+          <button onClick={() => setOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700/60 transition-colors text-left">
+            <UserCircle className="w-4 h-4 opacity-60" />
+            Profile
+          </button>
+          <button onClick={() => { setOpen(false); navigate('/settings'); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700/60 transition-colors text-left">
+            <Settings className="w-4 h-4 opacity-60" />
+            Settings
+          </button>
 
           <div className="my-1 border-t border-gray-100 dark:border-zinc-700/50" />
 

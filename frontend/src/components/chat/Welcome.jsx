@@ -1,8 +1,17 @@
-import { useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { QUICK_TOPICS } from '../../data/constants';
+import { useEffect, useState } from 'react';
+
+import { fetchQuickQuestions } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import udsmLogo from '../../assets/udsm.png';
+
+// Shown only if the API returns nothing (e.g. Ollama unreachable or the
+// knowledge base is empty) — a small last-resort fallback, not the source
+// of truth for suggestions.
+const FALLBACK_QUESTIONS = [
+  'What are the undergraduate admission requirements at UDSM?',
+  'How do I register for courses at UDSM?',
+  'What are the examination regulations at UDSM?',
+];
 
 function pickThree(arr) {
   const copy = [...arr];
@@ -16,7 +25,18 @@ function pickThree(arr) {
 
 export default function Welcome({ onPick }) {
   const { user } = useAuth();
-  const cards = useMemo(() => pickThree(QUICK_TOPICS), []);
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchQuickQuestions()
+      .then(({ questions }) => {
+        if (cancelled) return;
+        setCards(pickThree(questions?.length ? questions : FALLBACK_QUESTIONS));
+      })
+      .catch(() => { if (!cancelled) setCards(pickThree(FALLBACK_QUESTIONS)); });
+    return () => { cancelled = true; };
+  }, []);
 
   const firstName = user?.first_name || '';
   const greeting  = firstName ? `Hi, ${firstName}` : 'How can I help you?';
@@ -33,30 +53,23 @@ export default function Welcome({ onPick }) {
           {greeting}
         </h1>
         <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
-          Ask anything about UDSM — admissions, fees, exams, and more.
+          Ask anything about UDSM — admissions, fees, regulations, and more.
         </p>
       </div>
 
       {/* Suggestion cards */}
       <div className="w-full max-w-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {cards.map(({ icon: Icon, label, question }) => (
+        {cards.map((question) => (
           <button
-            key={label}
+            key={question}
             onClick={() => onPick(question)}
             className="group flex flex-col gap-3 text-left p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-amber-400/60 dark:hover:border-amber-500/40 hover:shadow-md dark:hover:shadow-zinc-900 transition-all duration-200"
           >
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-4 h-4 text-amber-500" />
-            </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 uppercase tracking-wide">
-                {label}
-              </p>
               <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-snug line-clamp-2">
                 {question}
               </p>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-600 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all self-end" />
           </button>
         ))}
       </div>

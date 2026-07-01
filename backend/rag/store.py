@@ -1,4 +1,5 @@
 import asyncio
+import random
 import re
 from pathlib import Path
 
@@ -59,6 +60,54 @@ def _build_bm25_sync() -> None:
     _bm25_docs  = data["documents"]
     _bm25_metas = data["metadatas"]
     _bm25 = BM25Okapi([_tokenize(d) for d in _bm25_docs]) if _bm25_docs else None
+
+
+_RE_ADMIN_NOISE = re.compile(
+    r"Regular Meeting|Committee|Board Meeting|Senate Meeting|Assembly|"
+    r"Postal Address|Telefax|P\.\s?O\.\s?BOX",
+    re.IGNORECASE,
+)
+
+
+def sample_snippets(n: int = 6) -> list[str]:
+    """Pick up to `n` chunks, spread across distinct source documents where
+    possible, to ground generated homepage quick-questions in content that
+    actually exists in the knowledge base rather than guessed topics.
+    Skips chunks that read as internal admin logs (staff meeting schedules,
+    committee rosters, address directories) — real content, but not the
+    kind of thing a student would ever ask about, which produced awkward
+    generated questions when sampled."""
+    if not _bm25_docs:
+        return []
+    by_source: dict[str, list[int]] = {}
+    for i, meta in enumerate(_bm25_metas):
+        by_source.setdefault(meta.get("source", "?"), []).append(i)
+
+    sources = list(by_source.keys())
+    random.shuffle(sources)
+    picks: list[str] = []
+    for source in sources:
+        if len(picks) >= n:
+            break
+        candidates = by_source[source][:]
+        random.shuffle(candidates)
+        for idx in candidates[:5]:  # try a few chunks before giving up on this source
+            text = _bm25_docs[idx]
+            if not _RE_ADMIN_NOISE.search(text):
+                picks.append(text)
+                break
+    return picks
+
+
+def list_sources() -> list[dict]:
+    """Aggregate indexed chunk counts by source document, for the admin UI.
+    Reuses the in-memory BM25 metadata (already loaded for search) instead
+    of a fresh Chroma query."""
+    counts: dict[str, int] = {}
+    for meta in _bm25_metas:
+        source = meta.get("source", "Unknown")
+        counts[source] = counts.get(source, 0) + 1
+    return [{"source": s, "chunks": c} for s, c in sorted(counts.items())]
 
 
 async def init() -> None:
